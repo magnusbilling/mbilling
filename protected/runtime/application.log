@@ -1,0 +1,13 @@
+2016/12/07 15:45:54 [error] [php] Undefined index: columns (/Library/WebServer/Documents/MBilling_5/protected/controllers/RateController.php:157)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/web/CController.php(308): CInlineAction->runWithParams()
+#1 /Library/WebServer/Documents/MBilling_5/yii/framework/web/CController.php(286): RateController->runAction()
+#2 /Library/WebServer/Documents/MBilling_5/yii/framework/web/CController.php(265): RateController->runActionWithFilters()
+#3 /Library/WebServer/Documents/MBilling_5/yii/framework/web/CWebApplication.php(282): RateController->run()
+#4 /Library/WebServer/Documents/MBilling_5/yii/framework/web/CWebApplication.php(141): CWebApplication->runController()
+#5 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CWebApplication->processRequest()
+#6 /Library/WebServer/Documents/MBilling_5/index.php(12): CWebApplication->run()
+REQUEST_URI=/MBilling_5/index.php/rate/report
+in /Library/WebServer/Documents/MBilling_5/protected/controllers/RateController.php (157)
+in /Library/WebServer/Documents/MBilling_5/protected/controllers/RateController.php (142)
+in /Library/WebServer/Documents/MBilling_5/index.php (12)

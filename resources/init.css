@@ -1,0 +1,93 @@
+/* Mask Loading App */
+#loading-mask {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 20000;
+	background-color: #FFF;
+}
+
+#loading {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	height: 90px;
+	margin-left: -190px;
+	margin-top: -45px;
+	z-index: 20001;
+}
+
+#loading .loading-indicator {
+	color: #444;
+	font: bold 13px tahoma,arial,helvetica;
+	padding: 10px;
+	margin: 0;
+	background-color: #FFF;
+}
+
+#loading-msg {
+	font: normal 10px arial,tahoma,sans-serif;
+	color: blue;
+}
+
+#text-msg {
+	font: italic 10px arial,tahoma,sans-serif;
+}
+
+/*
+ * Desktop
+ */
+/* Logo */
+#poweredby {
+	position: absolute;
+	bottom: 55px;
+	right: 20px;
+	z-index: 15000;
+	height: 79px;
+	width: 295px;
+	background: url(images/logo.png) no-repeat;
+	background-size: 200px 80px;
+	/* IE 5-7 */
+	filter: alpha(opacity=70);
+	/* Netscape */
+	-moz-opacity: 0.7;
+	/* Safari 1.x */
+	-khtml-opacity: 0.7;
+	/* Good browsers */
+	opacity: 0.7;
+}
+
+#link-credits {
+	position: absolute;
+	bottom: 40px;
+	right: 20px;
+	color: #FFF;
+	font: 12px tahoma,arial,verdana,sans-serif;
+	text-decoration: none;
+}
+/* The simple background image PNG does not work in IE6-8, but does in IE9 */
+.x-ie6 #poweredby div,
+.x-ie7 #poweredby div,
+.x-ie8 #poweredby div {
+  background-image: none;
+  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/logo.png', sizingMethod='scale');
+}
+.callshoFree {
+   height: 50px;
+   background: -webkit-linear-gradient(#FEFEFE , #d0ded4);
+}
+.callshoBlock {
+   height: 50px;
+   background: -webkit-linear-gradient(#FEFEFE , #EC6462);
+}
+.callshoInUse {
+   height: 50px;
+   background: -webkit-linear-gradient(#FEFEFE , #73C6EF);
+}
+.callshoInCall {
+   height: 50px;
+   background: -webkit-linear-gradient(#F3F3CA , #B0CB1F);
+}

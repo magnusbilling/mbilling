@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="UTF-8">
+    <meta name="description" content="MBilling, the best free billing to voip provider to Asterisk." />
+    <link rel="shortcut icon" href="resources/images/logo.ico" type="image/x-icon" />
+    <title>MBilling</title>
+    <script src="locale.js"></script>
+    <script src="icons.js"></script>
+    <script src="index.php"></script>
+    <link rel="stylesheet" href="resources/init.css">
+</head>
+<body>
+  <script type="text/javascript">
+      window.theme = window.theme || 'blue-classic';
+      window.themeApp = window.theme;
+      window.isThemeNeptune = window.theme.indexOf('neptune') !== -1;
+      window.isThemeCrisp = window.theme.indexOf('crisp') !== -1;
+      window.isThemeClassic = !window.isThemeNeptune && !window.isThemeCrisp;
+      window.layout=0;
+    </script>
+
+   	<div id="loading-mask"></div>
+	<div id="loading">
+		<div class="loading-indicator">
+			<div style="text-align:center">
+				<img src="resources/images/loading.gif" width='90px' style="vertical-align:top;"/>
+				<br/><span id="name-system"></span><br/>
+				<span id="text-msg"></span><br/>
+				<span id="loading-msg"></span>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+
+    var defaultLang= localStorage.getItem('lang') && localStorage.getItem('lang') != 'undefined' ? localStorage.getItem('lang') : localStorage.lang = window.lang;
+
+    var lang = defaultLang,
+      localeApp = 'resources/locale/' + lang + '.js';
+
+    document.write('<script type="text/javaScript" src="'+ localeApp +'"></'+'script>');
+    </script>
+
+    <script type="text/javascript">
+      document.getElementById('name-system').innerHTML = t('System') + ' MBilling';
+      document.getElementById('text-msg').innerHTML = 'Voip System';
+      document.getElementById('loading-msg').innerHTML = t('Loading...');
+    </script>  
+
+
+   	<!-- The line below must be kept intact for Sencha Cmd to build your application -->
+    <script type="text/javascript">
+        var Ext = Ext || {};
+        Ext.repoDevMode = true;
+        window.wallpapers = 'resources/images/wallpapers/'+window.wallpaper+'.jpg';
+        window.colorMenu = window.colorMenu;
+        Ext.beforeLoad = function(tags){
+            var theme = window.theme;
+            //tags.desktop = false;
+            window.isTablet = !tags.desktop;        
+            if(!tags.desktop) {
+              theme = 'blue-crisp-touch';
+            } Ext.manifest = theme; Ext.microloaderTags = tags; Ext.Boot.platformTags = Ext.platformTags || {};};</script><script id="microloader" data-app="ef2366d7-189a-4526-baac-e91d30e5bc33" type="text/javascript">var Ext=Ext||{};Ext.manifest=Ext.manifest||"blue-neptune.json";Ext=Ext||{};
+Ext.Boot=Ext.Boot||function(n){function m(a){if(a.$isRequest)return a;a=a.url?a:{url:a};var b=a.url,b=b.charAt?[b]:b,e=a.charset||c.config.charset;r(this,a);delete this.url;this.urls=b;this.charset=e}function p(a){if(a.$isEntry)return a;var b=a.charset||c.config.charset,e=Ext.manifest,e=e&&e.loader,d=void 0!==a.cache?a.cache:e&&e.cache,f;c.config.disableCaching&&(void 0===d&&(d=!c.config.disableCaching),!1===d?f=+new Date:!0!==d&&(f=d),f&&(e=e&&e.cacheParam||c.config.disableCachingParam,f=e+"\x3d"+
+f));r(this,a);this.charset=b;this.buster=f;this.requests=[]}var l=document,g=[],q={disableCaching:/[?&](?:cache|disableCacheBuster)\b/i.test(location.search)||!/http[s]?\:/i.test(location.href)||/(^|[ ;])ext-cache=1/.test(l.cookie)?!1:!0,disableCachingParam:"_dc",loadDelay:!1,preserveScripts:!0,charset:"UTF-8"},w=/\.css(?:\?|$)/i,u=l.createElement("a"),y="undefined"!==typeof window,v={browser:y,node:!y&&"function"===typeof require,phantom:window&&(window._phantom||window.callPhantom)||/PhantomJS/.test(window.navigator.userAgent)},
+k=Ext.platformTags={},r=function(a,b,e){e&&r(a,e);if(a&&b&&"object"===typeof b)for(var d in b)a[d]=b[d];return a},x=function(){var a=!1,b=Array.prototype.shift.call(arguments),e,d,c,h;"boolean"===typeof arguments[arguments.length-1]&&(a=Array.prototype.pop.call(arguments));c=arguments.length;for(e=0;e<c;e++)if(h=arguments[e],"object"===typeof h)for(d in h)b[a?d.toLowerCase():d]=h[d];return b},t="function"==typeof Object.keys?function(a){return a?Object.keys(a):[]}:function(a){var b=[],e;for(e in a)a.hasOwnProperty(e)&&
+b.push(e);return b},c={loading:0,loaded:0,apply:r,env:v,config:q,assetConfig:{},scripts:{},currentFile:null,suspendedQueue:[],currentRequest:null,syncMode:!1,useElements:!0,listeners:[],Request:m,Entry:p,allowMultipleBrowsers:!1,browserNames:{ie:"IE",firefox:"Firefox",safari:"Safari",chrome:"Chrome",opera:"Opera",dolfin:"Dolfin",edge:"Edge",webosbrowser:"webOSBrowser",chromeMobile:"ChromeMobile",chromeiOS:"ChromeiOS",silk:"Silk",other:"Other"},osNames:{ios:"iOS",android:"Android",windowsPhone:"WindowsPhone",
+webos:"webOS",blackberry:"BlackBerry",rimTablet:"RIMTablet",mac:"MacOS",win:"Windows",tizen:"Tizen",linux:"Linux",bada:"Bada",chromeOS:"ChromeOS",other:"Other"},browserPrefixes:{ie:"MSIE ",edge:"Edge/",firefox:"Firefox/",chrome:"Chrome/",safari:"Version/",opera:"OPR/",dolfin:"Dolfin/",webosbrowser:"wOSBrowser/",chromeMobile:"CrMo/",chromeiOS:"CriOS/",silk:"Silk/"},browserPriority:"edge opera dolfin webosbrowser silk chromeiOS chromeMobile ie firefox safari chrome".split(" "),osPrefixes:{tizen:"(Tizen )",
+ios:"i(?:Pad|Phone|Pod)(?:.*)CPU(?: iPhone)? OS ",android:"(Android |HTC_|Silk/)",windowsPhone:"Windows Phone ",blackberry:"(?:BlackBerry|BB)(?:.*)Version/",rimTablet:"RIM Tablet OS ",webos:"(?:webOS|hpwOS)/",bada:"Bada/",chromeOS:"CrOS "},fallbackOSPrefixes:{windows:"win",mac:"mac",linux:"linux"},devicePrefixes:{iPhone:"iPhone",iPod:"iPod",iPad:"iPad"},maxIEVersion:12,detectPlatformTags:function(){var a=this,b=navigator.userAgent,e=/Mobile(\/|\s)/.test(b),d=document.createElement("div"),f=function(){var e=
+{},c,d,f,h,g;d=a.browserPriority.length;for(h=0;h<d;h++)c=a.browserPriority[h],g?f=0:(f=a.browserPrefixes[c],(f=(f=b.match(new RegExp("("+f+")([\\w\\._]+)")))&&1<f.length?parseInt(f[2]):0)&&(g=!0)),e[c]=f;e.ie&&(h=document.documentMode,8<=h&&(e.ie=h));f=e.ie||!1;c=Math.max(f,a.maxIEVersion);for(h=8;h<=c;++h)d="ie"+h,e[d+"m"]=f?f<=h:0,e[d]=f?f===h:0,e[d+"p"]=f?f>=h:0;return e}(),h=function(){var e={},d,c,f,h,g,l,k;f=t(a.osPrefixes);g=f.length;for(k=h=0;h<g;h++)c=f[h],d=a.osPrefixes[c],l=(d=b.match(new RegExp("("+
+d+")([^\\s;]+)")))?d[1]:null,(d=!l||"HTC_"!==l&&"Silk/"!==l?d&&1<d.length?parseFloat(d[d.length-1]):0:2.3)&&k++,e[c]=d;f=t(a.fallbackOSPrefixes);g=f.length;for(h=0;h<g;h++)c=f[h],0===k?(d=a.fallbackOSPrefixes[c],d=b.toLowerCase().match(new RegExp(d)),e[c]=d?!0:0):e[c]=0;return e}(),g=function(){var e={},d,c,f,h,g;f=t(a.devicePrefixes);g=f.length;for(h=0;h<g;h++)c=f[h],d=a.devicePrefixes[c],d=b.match(new RegExp(d)),e[c]=d?!0:0;return e}(),l=c.loadPlatformsParam();x(k,f,h,g,l,!0);k.phone=!!(k.iphone||
+k.ipod||!k.silk&&k.android&&(3>k.android||e)||k.blackberry&&e||k.windowsphone);k.tablet=!(k.phone||!(k.ipad||k.android||k.silk||k.rimtablet||k.ie10&&/; Touch/.test(b)));k.touch=function(a,b){a="on"+a.toLowerCase();b=a in d;!b&&d.setAttribute&&d.removeAttribute&&(d.setAttribute(a,""),b="function"===typeof d[a],"undefined"!==typeof d[a]&&(d[a]=void 0),d.removeAttribute(a));return b}("touchend")||navigator.maxTouchPoints||navigator.msMaxTouchPoints;k.desktop=!k.phone&&!k.tablet;k.cordova=k.phonegap=
+!!(window.PhoneGap||window.Cordova||window.cordova);k.webview=/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)(?!.*FBAN)/i.test(b);k.androidstock=4.3>=k.android&&(k.safari||k.silk);x(k,l,!0)},loadPlatformsParam:function(){var a=window.location.search.substr(1).split("\x26"),b={},e,d={},c,h,g;for(e=0;e<a.length;e++)c=a[e].split("\x3d"),b[c[0]]=c[1];if(b.platformTags)for(c=b.platformTags.split(","),a=c.length,e=0;e<a;e++)b=c[e].split(":"),h=b[0],g=!0,1<b.length&&(g=b[1],"false"===g||"0"===g)&&(g=!1),d[h]=
+g;return d},filterPlatform:function(a,b){a=g.concat(a||g);b=g.concat(b||g);var e=a.length,d=b.length,c=!e&&d,h;for(h=0;h<e&&!c;h++)c=a[h],c=!!k[c];for(h=0;h<d&&c;h++)c=b[h],c=!k[c];return c},init:function(){var a=l.getElementsByTagName("script"),b=a[0],e=a.length,d=/\/ext(\-[a-z\-]+)?\.js$/,f,h,g,k,n;c.hasReadyState="readyState"in b;c.hasAsync="async"in b;c.hasDefer="defer"in b;c.hasOnLoad="onload"in b;c.isIE8=c.hasReadyState&&!c.hasAsync&&c.hasDefer&&!c.hasOnLoad;c.isIE9=c.hasReadyState&&!c.hasAsync&&
+c.hasDefer&&c.hasOnLoad;c.isIE10p=c.hasReadyState&&c.hasAsync&&c.hasDefer&&c.hasOnLoad;c.isIE10=10===(new Function("/*@cc_on return @_jscript_version @*/"))();c.isIE10m=c.isIE10||c.isIE9||c.isIE8;c.isIE11=c.isIE10p&&!c.isIE10;for(n=0;n<e;n++)if(f=(b=a[n]).src)h=b.readyState||null,!g&&d.test(f)&&(g=f),c.scripts[k=c.canonicalUrl(f)]||new p({key:k,url:f,done:null===h||"loaded"===h||"complete"===h,el:b,prop:"src"});g||(b=a[a.length-1],g=b.src);c.baseUrl=g.substring(0,g.lastIndexOf("/")+1);c.origin=window.location.origin||
+window.location.protocol+"//"+window.location.hostname+(window.location.port?":"+window.location.port:"");c.detectPlatformTags();Ext.filterPlatform=c.filterPlatform},canonicalUrl:function(a){u.href=a;a=u.href;var b=q.disableCachingParam,b=b?a.indexOf(b+"\x3d"):-1,e,c;0<b&&("?"===(e=a.charAt(b-1))||"\x26"===e)&&(c=a.indexOf("\x26",b),(c=0>c?"":a.substring(c))&&"?"===e&&(++b,c=c.substring(1)),a=a.substring(0,b-1)+c);return a},getConfig:function(a){return a?c.config[a]:c.config},setConfig:function(a,
+b){if("string"===typeof a)c.config[a]=b;else for(var e in a)c.setConfig(e,a[e]);return c},getHead:function(){return c.docHead||(c.docHead=l.head||l.getElementsByTagName("head")[0])},create:function(a,b,e){e=e||{};e.url=a;e.key=b;return c.scripts[b]=new p(e)},getEntry:function(a,b,e){var d,f;d=e?a:c.canonicalUrl(a);f=c.scripts[d];f||(f=c.create(a,d,b),e&&(f.canonicalPath=!0));return f},registerContent:function(a,b,e){return c.getEntry(a,{content:e,loaded:!0,css:"css"===b})},processRequest:function(a,
+b){a.loadEntries(b)},load:function(a){a=new m(a);if(a.sync||c.syncMode)return c.loadSync(a);c.currentRequest?(a.getEntries(),c.suspendedQueue.push(a)):(c.currentRequest=a,c.processRequest(a,!1));return c},loadSync:function(a){a=new m(a);c.syncMode++;c.processRequest(a,!0);c.syncMode--;return c},loadBasePrefix:function(a){a=new m(a);a.prependBaseUrl=!0;return c.load(a)},loadSyncBasePrefix:function(a){a=new m(a);a.prependBaseUrl=!0;return c.loadSync(a)},requestComplete:function(a){if(c.currentRequest===
+a)for(c.currentRequest=null;0<c.suspendedQueue.length;)if(a=c.suspendedQueue.shift(),!a.done){c.load(a);break}c.currentRequest||0!=c.suspendedQueue.length||c.fireListeners()},isLoading:function(){return!c.currentRequest&&0==c.suspendedQueue.length},fireListeners:function(){for(var a;c.isLoading()&&(a=c.listeners.shift());)a()},onBootReady:function(a){c.isLoading()?c.listeners.push(a):a()},getPathsFromIndexes:function(a,b){if(!("length"in a)){var c=[],d;for(d in a)isNaN(+d)||(c[+d]=a[d]);a=c}return m.prototype.getPathsFromIndexes(a,
+b)},createLoadOrderMap:function(a){return m.prototype.createLoadOrderMap(a)},fetch:function(a,b,c,d){d=void 0===d?!!b:d;var f=new XMLHttpRequest,h,g,k,l=!1,m=function(){f&&4==f.readyState&&(g=1223===f.status?204:0!==f.status||"file:"!==(self.location||{}).protocol&&"ionp:"!==(self.location||{}).protocol?f.status:200,k=f.responseText,h={content:k,status:g,exception:l},b&&b.call(c,h),f.onreadystatechange=n,f=null)};d&&(f.onreadystatechange=m);try{f.open("GET",a,d),f.send(null)}catch(p){return l=p,m(),
+h}d||m();return h},notifyAll:function(a){a.notifyRequests()}};m.prototype={$isRequest:!0,createLoadOrderMap:function(a){var b=a.length,c={},d,f;for(d=0;d<b;d++)f=a[d],c[f.path]=f;return c},getLoadIndexes:function(a,b,e,d,f){var h=[],g=[a];a=a.idx;var k,l,n;if(b[a])return h;for(b[a]=h[a]=!0;a=g.shift();)if(k=a.canonicalPath?c.getEntry(a.path,null,!0):c.getEntry(this.prepareUrl(a.path)),!f||!k.done)for(a=d&&a.uses&&a.uses.length?a.requires.concat(a.uses):a.requires,l=0,n=a.length;l<n;l++)k=a[l],b[k]||
+(b[k]=h[k]=!0,g.push(e[k]));return h},getPathsFromIndexes:function(a,b){var c=[],d,f;d=0;for(f=a.length;d<f;d++)a[d]&&c.push(b[d].path);return c},expandUrl:function(a,b,c,d,f,h){return b&&(c=c[a])&&(d=this.getLoadIndexes(c,d,b,f,h),d.length)?this.getPathsFromIndexes(d,b):[a]},expandUrls:function(a,b){var c=this.loadOrder,d=[],f={},h=[],g,k,l,n,m,p,q;"string"===typeof a&&(a=[a]);c&&(g=this.loadOrderMap,g||(g=this.loadOrderMap=this.createLoadOrderMap(c)));l=0;for(n=a.length;l<n;l++)for(k=this.expandUrl(a[l],
+c,g,h,b,!1),m=0,p=k.length;m<p;m++)q=k[m],f[q]||(f[q]=!0,d.push(q));0===d.length&&(d=a);return d},expandLoadOrder:function(){var a=this.urls,b;this.expanded?b=a:(b=this.expandUrls(a,!0),this.expanded=!0);this.urls=b;a.length!=b.length&&(this.sequential=!0);return this},getUrls:function(){this.expandLoadOrder();return this.urls},prepareUrl:function(a){return this.prependBaseUrl?c.baseUrl+a:a},getEntries:function(){var a=this.entries,b,e,d,f,h;if(!a){a=[];h=this.getUrls();this.loadOrder&&(b=this.loadOrderMap);
+for(d=0;d<h.length;d++)f=this.prepareUrl(h[d]),b&&(e=b[f]),f=c.getEntry(f,{buster:this.buster,charset:this.charset},e&&e.canonicalPath),f.requests.push(this),a.push(f);this.entries=a}return a},loadEntries:function(a){var b=this,c=b.getEntries(),d=c.length,f=b.loadStart||0,h,g;void 0!==a&&(b.sync=a);b.loaded=b.loaded||0;b.loading=b.loading||d;for(g=f;g<d;g++)if(h=c[g],f=h.loaded?!0:c[g].load(b.sync),!f){b.loadStart=g;h.onDone(function(){b.loadEntries(a)});break}b.processLoadedEntries()},processLoadedEntries:function(){var a=
+this.getEntries(),b=a.length,c=this.startIndex||0,d;if(!this.done){for(;c<b;c++){d=a[c];if(!d.loaded){this.startIndex=c;return}d.evaluated||d.evaluate();d.error&&(this.error=!0)}this.notify()}},notify:function(){var a=this;if(!a.done){var b=a.error,e=a[b?"failure":"success"],b="delay"in a?a.delay:b?1:c.config.chainDelay,d=a.scope||a;a.done=!0;e&&(0===b||0<b?setTimeout(function(){e.call(d,a)},b):e.call(d,a));a.fireListeners();c.requestComplete(a)}},onDone:function(a){var b=this.listeners||(this.listeners=
+[]);this.done?a(this):b.push(a)},fireListeners:function(){var a=this.listeners,b;if(a)for(;b=a.shift();)b(this)}};p.prototype={$isEntry:!0,done:!1,evaluated:!1,loaded:!1,isCrossDomain:function(){void 0===this.crossDomain&&(this.crossDomain=0!==this.getLoadUrl().indexOf(c.origin));return this.crossDomain},isCss:function(){if(void 0===this.css)if(this.url){var a=c.assetConfig[this.url];this.css=a?"css"===a.type:w.test(this.url)}else this.css=!1;return this.css},getElement:function(a){var b=this.el;
+b||(this.isCss()?(a=a||"link",b=l.createElement(a),"link"==a?(b.rel="stylesheet",this.prop="href"):this.prop="textContent",b.type="text/css"):(b=l.createElement(a||"script"),b.type="text/javascript",this.prop="src",this.charset&&(b.charset=this.charset),c.hasAsync&&(b.async=!1)),this.el=b);return b},getLoadUrl:function(){var a;a=this.canonicalPath?this.url:c.canonicalUrl(this.url);this.loadUrl||(this.loadUrl=this.buster?a+(-1===a.indexOf("?")?"?":"\x26")+this.buster:a);return this.loadUrl},fetch:function(a){var b=
+this.getLoadUrl();c.fetch(b,a.complete,this,!!a.async)},onContentLoaded:function(a){var b=a.status,c=a.content;a=a.exception;this.getLoadUrl();this.loaded=!0;!a&&0!==b||v.phantom?200<=b&&300>b||304===b||v.phantom||0===b&&0<c.length?this.content=c:this.evaluated=this.error=!0:this.evaluated=this.error=!0},createLoadElement:function(a){var b=this,e=b.getElement();b.preserve=!0;e.onerror=function(){b.error=!0;a&&(a(),a=null)};c.isIE10m?e.onreadystatechange=function(){"loaded"!==this.readyState&&"complete"!==
+this.readyState||!a||(a(),a=this.onreadystatechange=this.onerror=null)}:e.onload=function(){a();a=this.onload=this.onerror=null};e[b.prop]=b.getLoadUrl()},onLoadElementReady:function(){c.getHead().appendChild(this.getElement());this.evaluated=!0},inject:function(a,b){b=c.getHead();var e=this.url,d=this.key,f,g;this.isCss()?(this.preserve=!0,g=d.substring(0,d.lastIndexOf("/")+1),f=l.createElement("base"),f.href=g,b.firstChild?b.insertBefore(f,b.firstChild):b.appendChild(f),f.href=f.href,e&&(a+="\n/*# sourceURL\x3d"+
+d+" */"),e=this.getElement("style"),d="styleSheet"in e,b.appendChild(f),d?(b.appendChild(e),e.styleSheet.cssText=a):(e.textContent=a,b.appendChild(e)),b.removeChild(f)):(e&&(a+="\n//# sourceURL\x3d"+d),Ext.globalEval(a));return this},loadCrossDomain:function(){var a=this;a.createLoadElement(function(){a.el.onerror=a.el.onload=n;a.el=null;a.loaded=a.evaluated=a.done=!0;a.notifyRequests()});a.evaluateLoadElement();return!1},loadElement:function(){var a=this;a.createLoadElement(function(){a.el.onerror=
+a.el.onload=n;a.el=null;a.loaded=a.evaluated=a.done=!0;a.notifyRequests()});a.evaluateLoadElement();return!0},loadSync:function(){var a=this;a.fetch({async:!1,complete:function(b){a.onContentLoaded(b)}});a.evaluate();a.notifyRequests()},load:function(a){var b=this;if(!b.loaded){if(b.loading)return!1;b.loading=!0;if(a)b.loadSync();else{if(c.isIE10||b.isCrossDomain())return b.loadCrossDomain();if(!b.isCss()&&c.hasReadyState)b.createLoadElement(function(){b.loaded=!0;b.notifyRequests()});else if(!c.useElements||
+b.isCss()&&v.phantom)b.fetch({async:!a,complete:function(a){b.onContentLoaded(a);b.notifyRequests()}});else return b.loadElement()}}return!0},evaluateContent:function(){this.inject(this.content);this.content=null},evaluateLoadElement:function(){c.getHead().appendChild(this.getElement())},evaluate:function(){this.evaluated||this.evaluating||(this.evaluating=!0,void 0!==this.content?this.evaluateContent():this.error||this.evaluateLoadElement(),this.evaluated=this.done=!0,this.cleanup())},cleanup:function(){var a=
+this.el,b;if(a){if(!this.preserve)for(b in this.el=null,a.parentNode.removeChild(a),a)try{b!==this.prop&&(a[b]=null),delete a[b]}catch(c){}a.onload=a.onerror=a.onreadystatechange=n}},notifyRequests:function(){var a=this.requests,b=a.length,c,d;for(c=0;c<b;c++)d=a[c],d.processLoadedEntries();this.done&&this.fireListeners()},onDone:function(a){var b=this.listeners||(this.listeners=[]);this.done?a(this):b.push(a)},fireListeners:function(){var a=this.listeners,b;if(a&&0<a.length)for(;b=a.shift();)b(this)}};
+Ext.disableCacheBuster=function(a,b){var c=new Date;c.setTime(c.getTime()+864E5*(a?3650:-1));c=c.toGMTString();l.cookie="ext-cache\x3d1; expires\x3d"+c+"; path\x3d"+(b||"/")};c.init();return c}(function(){});Ext.globalEval=Ext.globalEval||(this.execScript?function(n){execScript(n)}:function(n){eval.call(window,n)});
+Function.prototype.bind||function(){var n=Array.prototype.slice,m=function(m){var l=n.call(arguments,1),g=this;if(l.length)return function(){var q=arguments;return g.apply(m,q.length?l.concat(n.call(q)):l)};l=null;return function(){return g.apply(m,arguments)}};Function.prototype.bind=m;m.$extjs=!0}();Ext.setResourcePath=function(n,m){var p=Ext.manifest||(Ext.manifest={}),l=p.resources||(p.resources={});p&&("string"!==typeof n?Ext.apply(l,n):l[n]=m,p.resources=l)};
+Ext.getResourcePath=function(n,m,p){"string"!==typeof n&&(m=n.pool,p=n.packageName,n=n.path);var l=Ext.manifest,l=l&&l.resources;m=l[m];var g=[];null==m&&(m=l.path,null==m&&(m="resources"));m&&g.push(m);p&&g.push(p);g.push(n);return g.join("/")};Ext=Ext||window.Ext||{};
+Ext.Microloader=Ext.Microloader||function(){var n=Ext.Boot,m=[],p=!1,l={detectPlatformTags:function(){Ext.beforeLoad&&Ext.beforeLoad(Ext.platformTags)},initPlatformTags:function(){l.detectPlatformTags()},init:function(){l.initPlatformTags();var g=Ext._beforereadyhandler;Ext._beforereadyhandler=function(){Ext.Boot!==n&&(Ext.apply(Ext.Boot,n),Ext.Boot=n);g&&g()}},run:function(){l.init();var g=Ext.manifest;"string"===typeof g?(g=g.indexOf(".json")===g.length-5?g:g+".json",0===location.href.indexOf("file:/")?
+n.load(g+"p"):n.fetch(g,function(g){l.setManifest(JSON.parse(g.content))})):l.load(g)},setManifest:function(g){manifest=Ext.manifest=g;l.load(manifest)},load:function(g){var m=g.loadOrder,w=m?n.createLoadOrderMap(m):null,u=[],y=g.js||[],v=g.css||[],k,r,x,t,c=function(){p=!0;l.notify()};m&&(g.loadOrderMap=w);(function(a,b){x=a.length;for(r=0;r<x;r++)k=a[r],t=!0,k.platform&&!n.filterPlatform(k.platform)&&(t=!1),t&&u.push(k.path);b?n.load({url:u,loadOrder:m,loadOrderMap:w,sequential:!0,success:c,failure:c}):
+n.loadSync({url:u,loadOrder:m,loadOrderMap:w})})(v.concat(y),!0)},onMicroloaderReady:function(g){p?g():m.push(g)},notify:function(){for(var g;g=m.shift();)g()}};return l}();Ext.manifest=Ext.manifest||"bootstrap";Ext.Microloader.run();</script>
+
+                     <script type="text/javascript">
+      
+      document.getElementById('loading-msg').innerHTML = t('Starting...');
+   </script>
+</body>
+</html>

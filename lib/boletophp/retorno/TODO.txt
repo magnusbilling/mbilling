@@ -1,0 +1,2 @@
+Verificar se os bancos que usam estes formatos, não há nenhuma diferença de um para outro.
+Testar o CNAB240
