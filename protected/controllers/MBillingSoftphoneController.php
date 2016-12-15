@@ -32,7 +32,6 @@ class MBillingSoftphoneController extends BaseController
 
 	public function actionRead()
 	{
-		
 		$config = LoadConfig::getConfig();
 
 		if (isset($_GET['l'])) {
@@ -42,11 +41,14 @@ class MBillingSoftphoneController extends BaseController
 		
 
 			$sql = "SELECT 'username', firstname, lastname, credit,
-					".$config['global']['base_currency']." AS currency, secret
+					'".$config['global']['base_currency']."' AS currency, secret
 					FROM pkg_sip join pkg_user ON pkg_sip.id_user = pkg_user.id WHERE pkg_sip.name = :user" ;
 			$command = Yii::app()->db->createCommand($sql);
 			$command->bindValue(":user", $user, PDO::PARAM_STR);
 			$result = $command->queryAll();
+
+			print_r($result);
+			exit;
 
 		
 			if(!isset($result[0]['username']) || strtoupper(MD5($result[0]['secret'])) != $pass){
@@ -197,7 +199,7 @@ class MBillingSoftphoneController extends BaseController
 			$user= $data[0];
 			$pass = $data[1];
 
-			$sql = "SELECT 'username',firstname, lastname, credit, ".$config['global']['base_currency']." AS currency, secret
+			$sql = "SELECT 'username',firstname, lastname, credit, '".$config['global']['base_currency']."' AS currency, secret
 								FROM pkg_sip join pkg_user ON pkg_sip.id_user = pkg_user.id WHERE pkg_sip.name = :user" ;
 			$command = Yii::app()->db->createCommand($sql);
 			$command->bindValue(":user", $user, PDO::PARAM_STR);

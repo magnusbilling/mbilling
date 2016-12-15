@@ -85,8 +85,8 @@ class SignupController extends BaseController
 			$command = Yii::app()->db->createCommand($sql);
 			$command->bindValue(":id", $_GET['id'], PDO::PARAM_STR);
 		}else{
-			$command = Yii::app()->db->createCommand($sql);
-			$sql .= "pkg_plan.id_user = 1";
+			$sql .= " AND pkg_plan.id_user = 1";
+			$command = Yii::app()->db->createCommand($sql);			
 		}		
 		$plan = $command->queryAll();
 

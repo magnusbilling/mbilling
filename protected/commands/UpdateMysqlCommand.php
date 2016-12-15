@@ -586,11 +586,11 @@ class UpdateMysqlCommand extends CConsoleCommand
 
 		if ( $version == '5.2.6' ) {
 
-			$password = util::gerarSenha(20,true,true,true,true);
+			$password = Util::gerarSenha(20,true,true,true,false);
 
 			$sql = "CREATE USER 'mbillingUser'@'localhost' IDENTIFIED BY '$password';
 			GRANT FILE ON * . * TO  'mbillingUser'@'localhost' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;
-			GRANT ALL PRIVILEGES ON  \`mbilling\` . * TO  'mbillingUser'@'localhost' WITH GRANT OPTION ;
+			GRANT ALL PRIVILEGES ON  `mbilling` . * TO  'mbillingUser'@'localhost' WITH GRANT OPTION ;
 			FLUSH PRIVILEGES;";
 			try {
 				Yii::app()->db->createCommand( $sql )->execute();

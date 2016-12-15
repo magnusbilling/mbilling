@@ -216,7 +216,7 @@ class SmsSendController extends BaseController
 				$command = Yii::app()->db->createCommand($sql);
 				$command->bindValue(":id_prefix", $id_prefix, PDO::PARAM_INT);
 				$command->bindValue(":id_user", $resultUser[0]['id'], PDO::PARAM_INT);
-				$command->bindValue(":destination", $destination[0]['id'], PDO::PARAM_STR);
+				$command->bindValue(":destination", $destination, PDO::PARAM_STR);
 				$command->bindValue(":text", $text, PDO::PARAM_STR);
 				$command->bindValue(":rateInitial", $rateInitial, PDO::PARAM_STR);
 				$command->bindValue(":sussess", $sussess, PDO::PARAM_STR);
@@ -286,6 +286,7 @@ class SmsSendController extends BaseController
 			$command->bindValue(":id_plan", $resultUser[0]['id_plan'], PDO::PARAM_INT);
 			$command->bindValue(":id_trunk", $callTrunk[0]['id_trunk'], PDO::PARAM_INT);
 			$command->bindValue(":buyRate", $buyRate, PDO::PARAM_STR);
+			$command->bindValue(":username", $username, PDO::PARAM_STR);
 			$command->bindValue(":terminateCauseid", $terminateCauseid, PDO::PARAM_INT);
 			$command->bindValue(":id_prefix", $id_prefix, PDO::PARAM_INT);
 			$command->bindValue(":rateInitialClientAgent", $rateInitialClientAgent, PDO::PARAM_STR);

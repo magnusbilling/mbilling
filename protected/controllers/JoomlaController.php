@@ -112,7 +112,7 @@ class JoomlaController extends BaseController
 			$is_android =true;
 			$_REQUEST['user'] = Util::getNewUsername();
 			$_REQUEST['password'] = Util::gerarSenha(8, true, true, true, false);
-			$_REQUEST['active'] = 1;
+			$_REQUEST['active'] = 0;
 		}
 		
 		$sql = "SELECT * FROM pkg_user WHERE email = :email";
@@ -184,6 +184,9 @@ class JoomlaController extends BaseController
 		$host = 'dynamic';
 		$insecure = 'no';
 
+	
+		
+
 		$sql = "INSERT INTO pkg_sip (id_user, name, accountcode, allow, host, insecure, defaultuser, secret, 
 						directmedia, regexten, callerid, cid_number, context) VALUES (:id_user, :user , 
 						:user ,  :allow , :host , :insecure , :user , :password, 'no' , :user, :user, :user,'billing')";
@@ -199,7 +202,7 @@ class JoomlaController extends BaseController
 
 		if (isset($is_android)) {
 			//echo $idUser;
-			$mail = new Mail(Mail::$TYPE_SIGNUPCONFIRM, $idUser);
+			$mail = new Mail(Mail::$TYPE_SIGNUP, $id);
 			$mail->send();
 			include("protected/commands/AGI.Class.php");
 			$asmanager = new AGI_AsteriskManager;

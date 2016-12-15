@@ -23,7 +23,7 @@ class BuyCreditController extends BaseController
 			$_GET['amount'] = $data[2];
 
 			$sql = "SELECT pkg_user.id, 'username',firstname, lastname, credit, pkg_user.id_user, id_plan, 
-			pkg_user.id_user, ".$config['global']['base_currency']." AS currency, secret
+			pkg_user.id_user, '".$config['global']['base_currency']."' AS currency, secret
 			FROM pkg_sip join pkg_user ON pkg_sip.id_user = pkg_user.id WHERE pkg_sip.name = :user" ;
 			$command = Yii::app()->db->createCommand($sql);
 			$command->bindValue(":user", $user, PDO::PARAM_STR);

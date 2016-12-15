@@ -16,7 +16,7 @@ FECHA=$DIA"-"$MES"-"$ANO
 
 cd /usr/local/src
 
-passwordMysql='cVxKeUvztJ'
+passwordMysql=$2
 
 ssh -t  $1 "cd /tmp/* "
 scp backup_voip_Magnus.$FECHA.tgz $1:/tmp

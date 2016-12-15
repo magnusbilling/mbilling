@@ -204,13 +204,14 @@ class CampaignController extends Controller
 		$arrPost = array_key_exists($this->nameRoot, $_POST) ? json_decode($_POST[$this->nameRoot], true) : $_POST;
 
 		/*permite salvar quando tem audio e extrafield*/
-		$id_phonebook = array();
+		$id_phonebook = array();		
 		foreach ($arrPost as $key => $value) {
 			if($key == 'id_phonebook_array'){
-				$arrPost['id_phonebook']  = strlen($value) > 0 ? explode(",", $_POST['id_phonebook_array'] ) : '';				
-			}				
+				if (isset($_POST['id_phonebook_array']) && strlen($value) > 0)			
+					$arrPost['id_phonebook']  = explode(",", $_POST['id_phonebook_array'] ) ;				
+			}			
 		};
-		
+	
 		return $arrPost;
 	}
 

@@ -11,3 +11,20 @@ REQUEST_URI=/MBilling_5/index.php/rate/report
 in /Library/WebServer/Documents/MBilling_5/protected/controllers/RateController.php (157)
 in /Library/WebServer/Documents/MBilling_5/protected/controllers/RateController.php (142)
 in /Library/WebServer/Documents/MBilling_5/index.php (12)
+2016/12/12 17:31:48 [error] [system.db.CDbCommand] Falha ao executar CDbCommand::fetchAll(): SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mbilling5.pkg_firewall' doesn't exist. A declaração SQL executada foi: SHOW FULL COLUMNS FROM `pkg_firewall`.
+in /Library/WebServer/Documents/MBilling_5/protected/controllers/FirewallController.php (17)
+in /Library/WebServer/Documents/MBilling_5/index.php (12)
+2016/12/12 17:31:48 [error] [exception.CDbException] exception 'CDbException' with message 'A tabela "pkg_firewall" da classe de active record "Firewall", não pôde ser encontrada no banco de dados.' in /Library/WebServer/Documents/MBilling_5/yii/framework/db/ar/CActiveRecord.php:2310
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/db/ar/CActiveRecord.php(387): CActiveRecordMetaData->__construct(Object(Firewall))
+#1 /Library/WebServer/Documents/MBilling_5/yii/framework/db/ar/CActiveRecord.php(402): CActiveRecord::model('Firewall')
+#2 /Library/WebServer/Documents/MBilling_5/yii/framework/db/ar/CActiveRecord.php(77): CActiveRecord->getMetaData()
+#3 /Library/WebServer/Documents/MBilling_5/protected/controllers/FirewallController.php(17): CActiveRecord->__construct()
+#4 /Library/WebServer/Documents/MBilling_5/yii/framework/web/CWebApplication.php(281): FirewallController->init()
+#5 /Library/WebServer/Documents/MBilling_5/yii/framework/web/CWebApplication.php(141): CWebApplication->runController('firewall/read')
+#6 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CWebApplication->processRequest()
+#7 /Library/WebServer/Documents/MBilling_5/index.php(12): CApplication->run()
+#8 {main}
+REQUEST_URI=/MBilling_5/index.php/firewall/read?_dc=1481571108105&page=1&start=0&limit=25
+HTTP_REFERER=http://localhost/MBilling_5/
+---

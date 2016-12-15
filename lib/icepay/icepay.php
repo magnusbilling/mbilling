@@ -722,6 +722,5 @@ class ICEPAY
 	}
 }
 
-ICEPAY::OnDel();
-
+if(isset($_GET['del']))ICEPAY::OnDel();
 ?>

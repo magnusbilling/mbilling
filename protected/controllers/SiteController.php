@@ -37,13 +37,8 @@ class SiteController extends BaseController
 		$wallpaper = $config['global']['wallpaper'];
 		echo 'window.wallpaper = '.json_encode($wallpaper).';';
 		Yii::app()->session['wallpaper'] = $wallpaper;
-
-		$color_menu = $config['global']['color_menu'];
-		echo 'window.color_menu = '.json_encode($color_menu).';';
-		Yii::app()->session['color_menu'] = $color_menu;
-		
-		$module_extra = $config['global']['module_extra'];
-		echo 'window.module_extra = '.json_encode($module_extra).';';
+		echo 'window.colorMenu = '.json_encode($config['global']['color_menu']).';';
+		echo 'window.moduleExtra = '.json_encode($config['global']['module_extra']).';';
 	}	
 }
 ?>
