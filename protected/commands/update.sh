@@ -39,7 +39,9 @@ chmod -R 555 /var/www/html/mbilling/
 chmod -R 750 /var/www/html/mbilling/resources/reports 
 chmod -R 774 /var/www/html/mbilling/protected/runtime/
 chmod +x /var/www/html/mbilling/agi.php
+if [ ! -d "/var/www/tmpmagnus" ]; then
 mkdir /var/www/tmpmagnus
+fi
 chown -R asterisk:asterisk /var/www/tmpmagnus
 chmod -R 777 /var/www/tmpmagnus
 chmod 774 /var/www/html/mbilling/resources/ip.blacklist
