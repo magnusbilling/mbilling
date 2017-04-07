@@ -19,7 +19,7 @@
  * 29/10/2012
  */
 
-class CampaignPhonebook extends CActiveRecord
+class CampaignPhonebook extends Model
 {
 	protected $_module = 'campaignphonebook';
 	/**

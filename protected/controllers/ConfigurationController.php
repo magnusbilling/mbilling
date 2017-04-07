@@ -62,4 +62,28 @@ class ConfigurationController extends Controller
                 $this->nameMsg => '',
             ));
 	}
+
+	public function actionSetData()
+	{
+		$model = Configuration::model()->findByAttributes(array('config_key'=> 'admin_email'));
+		$model->config_value = $_POST['email'];
+		$model->save();
+
+		$model = Configuration::model()->findByAttributes(array('config_key'=> 'base_country'));
+		$model->config_value = $_POST['countryiso'];
+		$model->save();
+
+		$model = Configuration::model()->findByAttributes(array('config_key'=> 'base_currency'));
+		$model->config_value = $_POST['currency'];
+		$model->save();
+
+		Yii::app()->session['base_country'] = $_POST['countryiso'];
+		Yii::app()->session['email'] =$_POST['email'];
+		Yii::app()->session['currency'] =$_POST['currency'];
+		
+		echo json_encode(array(
+          	$this->nameSuccess => true,
+          	$this->nameMsg => 'Success',
+       	));
+	}
 }

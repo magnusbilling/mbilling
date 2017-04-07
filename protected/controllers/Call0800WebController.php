@@ -131,7 +131,9 @@ class Call0800WebController extends BaseController
 			}else{
 
 				$user= $data[0];
-				$pass = $data[1];			
+				$pass = $data[1];	
+
+
 
 				$sql = "SELECT pkg_user.id, username,firstname, lastname, credit, pkg_user.id_user, id_plan,
 				'".$config['global']['base_currency']."' AS currency, secret, pkg_user.prefix_local 
@@ -139,7 +141,6 @@ class Call0800WebController extends BaseController
 				$command = Yii::app()->db->createCommand($sql);
 				$command->bindValue(":user", $user, PDO::PARAM_STR);
 				$result = $command->queryAll();
-
 
 
 				if(!isset($result[0]['username']) || strtoupper(MD5($result[0]['secret'])) != $pass){
@@ -195,21 +196,9 @@ class Call0800WebController extends BaseController
 				$yournumber = Portabilidade :: getDestination($yournumber, true, false,$result[0]['id_plan']);
 
 
-				$sql = "SELECT pkg_rate.id AS idRate, rateinitial, buyrate, pkg_prefix.id AS id_prefix, pkg_rate.id_trunk, rt_trunk.trunkcode, rt_trunk.trunkprefix, rt_trunk.removeprefix, rt_trunk.providertech, rt_trunk.inuse, rt_trunk.providerip, 
-							rt_trunk.maxuse, rt_trunk.status, rt_trunk.failover_trunk, rt_trunk.link_sms, rt_trunk.sms_res 
-					FROM pkg_rate
-					LEFT JOIN pkg_plan ON pkg_rate.id_plan=pkg_plan.id
-					LEFT JOIN pkg_trunk AS rt_trunk ON pkg_rate.id_trunk=rt_trunk.id
-					LEFT JOIN pkg_prefix ON pkg_rate.id_prefix=pkg_prefix.id
-					WHERE prefix = SUBSTRING(:yournumber,1,length(prefix)) and pkg_plan.id= :id_plan 
-					ORDER BY LENGTH(prefix) DESC";
-
-				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(":yournumber", $yournumber, PDO::PARAM_STR);
-				$command->bindValue(":id_plan", $result[0]['id_plan'], PDO::PARAM_STR);
-				$callTrunk = $command->queryAll();
-
-
+				$SearchTariff = new SearchTariff();
+				$callTrunk = $SearchTariff->find($yournumber, $result[0]['id_plan'], $result[0]['id']);
+				
 				if (count($callTrunk) == 0)
 				{
 					echo Yii::t('yii','Prefix not found to you number');
@@ -220,23 +209,8 @@ class Call0800WebController extends BaseController
 
 				$destination = Portabilidade :: getDestination($destination, true, false,$result[0]['id_plan']);
 
-
-				$sql = "SELECT pkg_rate.id AS idRate, rateinitial, buyrate, pkg_prefix.id AS id_prefix, pkg_rate.id_trunk, rt_trunk.trunkcode, rt_trunk.trunkprefix, rt_trunk.removeprefix, rt_trunk.providertech, rt_trunk.inuse, rt_trunk.providerip, 
-							rt_trunk.maxuse, rt_trunk.status, rt_trunk.failover_trunk, rt_trunk.link_sms, rt_trunk.sms_res 
-					FROM pkg_rate
-					LEFT JOIN pkg_plan ON pkg_rate.id_plan=pkg_plan.id
-					LEFT JOIN pkg_trunk AS rt_trunk ON pkg_rate.id_trunk=rt_trunk.id
-					LEFT JOIN pkg_prefix ON pkg_rate.id_prefix=pkg_prefix.id
-
-					WHERE prefix = SUBSTRING(:destination,1,length(prefix)) and pkg_plan.id= :id_plan 
-					ORDER BY LENGTH(prefix) DESC";
-	
-				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(":destination", $destination, PDO::PARAM_STR);
-				$command->bindValue(":id_plan", $result[0]['id_plan'], PDO::PARAM_STR);
-				$callTrunkDestination = $command->queryAll();
-
-	
+				$callTrunkDestination = $SearchTariff->find($destination, $result[0]['id_plan'], $result[0]['id']);
+		
 				if (count($callTrunkDestination) == 0)
 				{
 					echo $sql;
@@ -253,10 +227,10 @@ class Call0800WebController extends BaseController
 		          	$destination = str_replace(substr($destination, 0, 7), "", $destination);
 
 		          $yournumber 	 = $yournumber;
-                    $providertech   = $callTrunk[0]['providertech'];
-                    $ipaddress      = $callTrunk[0]['providerip'];
-                    $removeprefix   = $callTrunk[0]['removeprefix'];
-                    $prefix         = $callTrunk[0]['trunkprefix'];
+                    $providertech   = $callTrunk[0]['rc_providertech'];
+                    $ipaddress      = $callTrunk[0]['rc_providerip'];
+                    $removeprefix   = $callTrunk[0]['rc_removeprefix'];
+                    $prefix         = $callTrunk[0]['rc_trunkprefix'];
 
                     if (strncmp($yournumber, $removeprefix, strlen($removeprefix)) == 0)
                          $yournumber = substr($yournumber, strlen($removeprefix));
@@ -271,7 +245,7 @@ class Call0800WebController extends BaseController
                     $call .= "Extension: " . $yournumber. "\n";
                     $call .= "Priority: 1\n";
                     $call .= "Set:CALLED=" . $yournumber. "\n";
-                    $call .= "Set:TARRIFID=" . $callTrunk[0]['idRate']. "\n";
+                    $call .= "Set:TARRIFID=" . $callTrunk[0]['id_rate']. "\n";
                     $call .= "Set:SELLCOST=" . $callTrunk[0]['rateinitial']. "\n";
                     $call .= "Set:BUYCOST=" . $callTrunk[0]['buyrate']. "\n";
                     $call .= "Set:CIDCALLBACK=1\n";
@@ -304,3 +278,33 @@ class Call0800WebController extends BaseController
 	}
 
 }
+
+/*
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>              
+<script type="text/javascript">	
+	function submitForm() {
+		var number = document.getElementById('number').value;
+		var user = document.getElementById('user').value;
+		if (number == '') {
+			alert('Numero invalido');
+			exit;
+		}
+	    	$.ajax({
+	          type: "GET",
+	          url: "http://ip/mbilling/index.php/callFree?user="+user+"&number="+number,
+	          success: function(returnValue){
+	               alert("Su telefono va llamar");
+	          },
+	          error: function(request,error) {
+	          	alert("error");
+	          }
+	    	});
+	}
+</script>
+<form method='GET' >
+    <input name="number" type="text" class="input" id="number" size="10" style="font-family: 'Handlee', cursive" />
+    <input type="hidden" name="user" id='user' value="prueba">
+    <input name="button" type="button" value="Ll&aacute;mame" onclick="return submitForm();">
+</form>
+
+*/

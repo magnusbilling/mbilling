@@ -98,6 +98,12 @@ class PhoneNumberController extends Controller
 
 	public function actionImportFromCsv()
 	{
+		$module = $this->instanceModel->getModule();
+
+		if(!AccessManager::getInstance($module)->canCreate()){
+				header('HTTP/1.0 401 Unauthorized');
+	 			die("Access denied to save in module: $module");
+		}
 
 		if(!Yii::app()->session['id_user'])
 			exit();
@@ -168,6 +174,13 @@ class PhoneNumberController extends Controller
 
 	public function actionReprocesar()
 	{
+		$module = $this->instanceModel->getModule();
+
+		if(!AccessManager::getInstance($module)->canUpdate()){
+				header('HTTP/1.0 401 Unauthorized');
+	 			die("Access denied to save in module: $module");
+		}
+
 		# recebe os parametros para o filtro
 		if(isset($_POST['filter']) && strlen($_POST['filter']) > 5)
 			$filter =  $_POST['filter'];

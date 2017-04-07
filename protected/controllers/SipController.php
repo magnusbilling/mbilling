@@ -24,6 +24,11 @@ class SipController extends Controller
 	public $defaultFilterByUser = 'b.id_user';
 	public $join                = 'JOIN pkg_user b ON t.id_user = b.id';
 
+	private $host = 'localhost';
+    private $user = 'magnus';
+    private $password = 'magnussolution';
+	private $sipShowPeers = array();
+
 	public $fieldsFkReport = array(
 		'id_user' => array(
 			'table' => 'pkg_user',
@@ -37,6 +42,14 @@ class SipController extends Controller
 		$this->abstractModel = Sip::model();
 		parent::init();
 	}
+
+	public function actionRead()
+	{
+		$sipShowPeers = new AGI_ParseData(); 
+		$this->sipShowPeers =$sipShowPeers->SipShowPeers();
+		parent::actionRead();
+	}
+
 
 	public function actionRealtime()
 	{
@@ -150,11 +163,9 @@ class SipController extends Controller
 				$command->bindValue(":id", $id, PDO::PARAM_INT);
 				$resultSip=  $command->queryAll();
 
-
-				$sql = "DELETE FROM $dbname.$table WHERE username = :username";
-				$con->createCommand( $sql );
-				$con->bindParam(":username", $$resultSip[0]['name'], PDO::PARAM_STR);
-				$con->execute();
+				 
+				$sql = "DELETE FROM $dbname.$table WHERE username = '".$resultSip[0]['name']."'";
+				$con->createCommand( $sql )->execute();
 			}
 
 		}
@@ -169,10 +180,15 @@ class SipController extends Controller
 
 		foreach ( $models as $key => $item ) {
 			$attributes[$key] = $item->attributes;
-			if ( file_exists( $configFile ) && $item->attributes['secret'] == '' ) {
-				$attributes[$key]['secret'] = $item->attributes['sippasswd'];
-			}
 
+
+			$attributes[$key]['lineStatus'] = 'unregistered';
+			foreach ($this->sipShowPeers as $value) {
+				if ($value['Name/username'] == $attributes[$key]['name'].'/'.$attributes[$key]['name']) {
+					$attributes[$key]['lineStatus'] = $value['Status'];
+				}
+			}		
+		
 			if ( isset( $_SESSION['isClient'] ) && $_SESSION['isClient'] ) {
 				foreach ( $this->fieldsInvisibleClient as $field ) {
 					unset( $attributes[$key][$field] );

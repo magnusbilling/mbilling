@@ -30,9 +30,11 @@
 	
 
 	$TotalAmount = $_GET['amount'];
-	$TotalAmount = preg_replace("/,/", '', $TotalAmount);
+	$TotalAmount = $selectdAmount = preg_replace("/,/", '', $TotalAmount);
 
-	if (isset($_GET['iva']) && $_GET['iva'] == 1) {
+
+
+	if ( (isset($_GET['iva']) && $_GET['iva'] == 1 )|| strlen($card->vat) > 1 ) {
 
 		if (preg_match("/\+/", $card->vat)) {
 	      $TotalAmount = $TotalAmount * ((intval($card->vat) / 100 ) + 1) ;
@@ -42,7 +44,8 @@
 	      $TotalAmount =   $TotalAmount /  ((intval($card->vat) / 100 ) + 1) ;
 	 
 	   }
-   }
+   	}
+
 
 
 	$TaxAmount = $methodPay->P2P_tax_amount;
@@ -232,7 +235,7 @@ tel&eacute;fono si tiene alguna inquietud cont&aacute;ctenos al tel&eacute;fono 
     		$sql = "INSERT INTO pkg_refill (id_user, credit, payment) VALUES (:id_user,:totalAmount, 0)";
 		$command = Yii::app()->db->createCommand($sql);
 		$command->bindValue(":id_user", $card->id, PDO::PARAM_INT);
-		$command->bindValue(":totalAmount", $TotalAmount, PDO::PARAM_STR);
+		$command->bindValue(":totalAmount", $selectdAmount, PDO::PARAM_STR);
 		$command->execute();
 
 		$Reference = Yii::app()->db->lastInsertID;
@@ -244,7 +247,8 @@ tel&eacute;fono si tiene alguna inquietud cont&aacute;ctenos al tel&eacute;fono 
 		$command->bindValue(":descr", $descr, PDO::PARAM_STR);
 		$command->execute();
     }
-	
+
+
 	$paymentRequest = $p2p->getPaymentRedirect(
 		P2P_KeyID, P2P_Passphrase, P2P_RecipientKeyID,
 		P2P_CustomerSiteID, $Reference, $TotalAmount, $TaxAmount, $DevolutionBaseAmount);

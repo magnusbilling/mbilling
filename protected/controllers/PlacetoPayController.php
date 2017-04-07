@@ -102,18 +102,18 @@ class PlacetoPayController extends BaseController
 							$codigo = 	$p2p->getReceipt();	
 
 							if ( $resultUser[0]['country'] == 57 && $monto > 0) {
-			                        	$sql = "INSERT INTO pkg_invoice (id_user) VALUES (:id_user)";
-			                        	$command = Yii::app()->db->createCommand($sql);
+	                        	$sql = "INSERT INTO pkg_invoice (id_user) VALUES (:id_user)";
+	                        	$command = Yii::app()->db->createCommand($sql);
 								$command->bindValue(":id_user", $id_user, PDO::PARAM_INT);
 								$command->execute();
 
-			                        	$invoice_number = Yii::app()->db->lastInsertID;
-			                        	$sql = "UPDATE pkg_refill SET invoice_number = :invoice_number WHERE id = :id";
-			                        	$command = Yii::app()->db->createCommand($sql);
+	                        	$invoice_number = Yii::app()->db->lastInsertID;
+	                        	$sql = "UPDATE pkg_refill SET invoice_number = :invoice_number WHERE id = :id";
+	                        	$command = Yii::app()->db->createCommand($sql);
 								$command->bindValue(":id", $id, PDO::PARAM_INT);
 								$command->bindValue(":invoice_number", $invoice_number, PDO::PARAM_STR);
 								$command->execute();
-			                    }			
+			                }			
 							
 							$sql = "UPDATE pkg_refill SET description = :description, payment = 1 WHERE id = :id";
 			                   	$command = Yii::app()->db->createCommand($sql);
@@ -121,10 +121,12 @@ class PlacetoPayController extends BaseController
 							$command->bindValue(":description", $description, PDO::PARAM_STR);
 							$command->execute();
 
+
+
 			                    $sql = "UPDATE pkg_user SET credit = credit + :monto WHERE id = :id_user";
 			                    $command = Yii::app()->db->createCommand($sql);
 							$command->bindValue(":id_user", $id_user, PDO::PARAM_INT);
-							$command->bindValue(":monto", $monto, PDO::PARAM_STR);
+							$command->bindValue(":monto", $resultRefill[0]['credit'], PDO::PARAM_STR);
 							$command->execute();
 
 

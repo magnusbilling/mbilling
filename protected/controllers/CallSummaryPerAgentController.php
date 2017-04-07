@@ -156,7 +156,7 @@ class CallSummaryPerAgentController extends Controller
 
     public function extraFilter ($filter)
     {
-
+        $config = LoadConfig::getConfig();
         $filter = $this->filterReplace($filter);      
 
 

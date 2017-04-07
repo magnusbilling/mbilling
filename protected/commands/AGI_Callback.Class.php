@@ -61,7 +61,13 @@ class AGI_Callback
 
 	          		$agi->verbose($MAGNUS->countryCode,15);
 		          	$agi->verbose($MAGNUS->destination,15);
-		          	$resfindrate = SearchTariff::find($MAGNUS, $agi, $Calc);
+
+		          	$SearchTariff = new SearchTariff();
+	 				$resfindrate = $SearchTariff->find($MAGNUS->destination, $MAGNUS->id_plan, $MAGNUS->id_user, $agi);
+
+		          	$Calc->tariffObj = $resfindrate;
+        				$Calc->number_trunk = count( $resfindrate );
+        				
 		          	if(substr("$MAGNUS->destination", 0, 4) == 1111)
 		          		$MAGNUS->destination = str_replace(substr($MAGNUS->destination, 0, 7), "", $MAGNUS->destination);
 		     

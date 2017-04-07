@@ -154,14 +154,14 @@ class RateController extends Controller
 		//altera as colunas para poder pegar o destino das tarifas
 		$destino = '{"header":"Prefixo","dataIndex":"idPrefixprefix"},';
 		$destinoNew = '{"header":"Prefixo","dataIndex":"id_prefix"},';
-		if ( preg_match( "/$destino/", $_POST['columns'] ) ) {
-			$_POST['columns'] = preg_replace( "/$destino/", $destinoNew , $_POST['columns'] );
+		if ( preg_match( "/$destino/", $_GET['columns'] ) ) {
+			$_GET['columns'] = preg_replace( "/$destino/", $destinoNew , $_GET['columns'] );
 		}
 
 		$destino = '{"header":"Destino","dataIndex":"idPrefixdestination"},';
 		$destinoNew = '{"header":"Destino","dataIndex":"id"},';
-		if ( preg_match( "/$destino/", $_POST['columns'] ) ) {
-			$_POST['columns'] = preg_replace( "/$destino/", $destinoNew , $_POST['columns'] );
+		if ( preg_match( "/$destino/", $_GET['columns'] ) ) {
+			$_GET['columns'] = preg_replace( "/$destino/", $destinoNew , $_GET['columns'] );
 		}
 	}
 

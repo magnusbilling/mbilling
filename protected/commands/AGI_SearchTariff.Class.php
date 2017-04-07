@@ -20,6 +20,28 @@
 class SearchTariff {
     public function find( &$MAGNUS, $agi, $Calc ) {
 
+        //return the maximun length of prefix 
+
+        $sql ="SELECT length FROM pkg_prefix_length WHERE prefix = '".substr( $MAGNUS->destination, 0, 2 )."'";
+
+        /*00,0
+        11, 8
+        12,5
+        55,7
+        54,5
+        56,4
+        57,8
+        34,6
+        99,0
+
+        346
+        3469
+        34854
+        34587
+        345875
+        345885*/
+
+
         $sql = "SELECT length(prefix) as prefix FROM pkg_prefix WHERE prefix LIKE '".substr( $MAGNUS->destination, 0, 2 )."%' ORDER BY length(prefix) DESC LIMIT 1";
         $agi->verbose( $sql, 25 );
         $resultPrefixLen = Yii::app()->db->createCommand( $sql )->queryAll();
@@ -35,6 +57,11 @@ class SearchTariff {
             $max_len_prefix--;
         }
         $prefixclause = substr( $prefixclause, 0, -3 ).")";
+
+        $prefixclause .= " OR (prefix LIKE '&_%' ESCAPE '&' AND '".$MAGNUS->destination."'
+                    REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', prefix, '$'), 
+                    'X', '[0-9]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
+
 
         $agi->verbose( $prefixclause, 20 );
 
@@ -57,7 +84,7 @@ class SearchTariff {
             "LEFT JOIN pkg_provider ON pkg_trunk.id_provider = pkg_provider.id " .
             "WHERE pkg_plan.id=$MAGNUS->id_plan AND pkg_rate.status = 1 AND $prefixclause " .
             "ORDER BY pkg_prefix.prefix DESC";
-        $agi->verbose( $sql, 25 );
+        $agi->verbose( $sql, 1 );
         $result = Yii::app()->db->createCommand( $sql )->queryAll();
 
 

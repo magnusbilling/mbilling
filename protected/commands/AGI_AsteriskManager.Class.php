@@ -226,6 +226,8 @@
 
       // connect the socket
       $errno = $errstr = NULL;
+      set_time_limit(2);
+      ini_set("default_socket_timeout", 2);
       $this->socket = @fsockopen($this->server, $this->port, $errno, $errstr);
       if($this->socket == false)
       {

@@ -38,6 +38,8 @@ else if ($_SESSION['currency'] == 'R$')
     $currency = 'BRL';
 elseif ($_SESSION['currency'] == '€') 
     $currency ='EUR';
+elseif( $_SESSION['currency'] == 'AUD$')
+    $currency ='AUD';
 else
     $currency = $_SESSION['currency'];
 

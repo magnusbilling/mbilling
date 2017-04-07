@@ -22,6 +22,7 @@
 class Sip extends Model
 {
 	protected $_module = 'sip';
+	private $lineStatus;
 	/**
 	 * Retorna a classe estatica da model.
 	 *
@@ -149,10 +150,12 @@ class Sip extends Model
 				$con=new CDbConnection( $dsn, $user, $password );
 				$con->active=true;
 				if ( $this->getIsNewRecord() ) {
-					$sql = "INSERT INTO $dbname.$table (username,domain,password,accountcode) VALUES ('$this->defaultuser','$hostname','$this->secret','$this->accountcode')";
+					$sql = "INSERT INTO $dbname.$table (username,domain,ha1,accountcode) VALUES 
+							('$this->defaultuser','$hostname','".md5($this->defaultuser.':'.$hostname.':'.$this->secret )."','$this->accountcode')";
 					$con->createCommand( $sql )->execute();
 				}else {
-					$sql = "UPDATE $dbname.$table SET password = '$this->secret', username = '$this->defaultuser' WHERE username = '$this->defaultuser'";
+					$sql = "UPDATE $dbname.$table SET ha1 = '".md5($this->defaultuser.':'.$hostname.':'.$this->secret )."', 
+							username = '$this->defaultuser' WHERE username = '$this->defaultuser'";
 					$con->createCommand( $sql )->execute();
 				}
 			}

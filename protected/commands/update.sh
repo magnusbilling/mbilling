@@ -25,14 +25,24 @@ fi
 rm -rf /var/www/html/mbilling/MBilling*.tar.gz
 cd /var/www/html/mbilling
 wget http://master.dl.sourceforge.net/project/magnusbilling/MBilling-5-current.tar.gz
+rm -rf /var/www/html/mbilling/yii
 tar xzf MBilling-5-current.tar.gz
 rm -rf /var/www/html/mbilling/MBilling*.tar.gz
 php /var/www/html/mbilling/cron.php UpdateMysql
 rm -rf /var/www/html/mbilling/doc
+chown -R asterisk:asterisk /var/lib/php/session/
+chown -R asterisk:asterisk /var/spool/asterisk/outgoing/
+chown -R asterisk:asterisk /etc/asterisk
 chown -R asterisk:asterisk /var/www/html/mbilling
 chmod -R 777 /tmp
 chmod -R 555 /var/www/html/mbilling/
 chmod -R 750 /var/www/html/mbilling/resources/reports 
-chmod 770 /var/www/html/mbilling/protected/runtime/ && rm -rf /var/www/html/mbilling/yii/framework/gii && rm -rf /var/www/html/mbilling/yii/framework/caching && rm -rf /var/www/html/mbilling/yii/framework/zii && rm -rf /var/www/html/mbilling/yii/framework/db/tmp*.php && rm -rf /var/www/html/mbilling/yii/framework/yiic && rm -rf /var/www/html/mbilling/yii/framework/db/ws.php && rm -rf /var/www/html/mbilling/yii/framework/test
-chmod 755 /var/www/html/mbilling/resources/ip.blacklist
-service httpd restart
+chmod -R 774 /var/www/html/mbilling/protected/runtime/
+chmod +x /var/www/html/mbilling/agi.php
+mkdir /var/www/tmpmagnus
+chown -R asterisk:asterisk /var/www/tmpmagnus
+chmod -R 777 /var/www/tmpmagnus
+chmod 774 /var/www/html/mbilling/resources/ip.blacklist
+chmod -R 655 /var/www/html/mbilling/tmp
+chmod -R 750 /var/www/html/mbilling/resources/sounds
+chmod -R 770 /var/www/html/mbilling/resources/images

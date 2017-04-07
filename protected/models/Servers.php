@@ -99,11 +99,12 @@ class Servers extends Model
 
 			$sql = "TRUNCATE $dbname.$table";
 			$con->createCommand( $sql )->execute();
-			$sql = "SELECT * FROM pkg_servers WHERE type = 'asterisk' AND status = 1";
+			$sql = "SELECT * FROM pkg_servers WHERE (type = 'asterisk' OR type = 'mbilling')  
+						AND status = 1 AND weight > 0";
 			$resultFS = Yii::app()->db->createCommand( $sql )->queryAll();
 
-			foreach ( $resultFS as $key => $freeswitch ) {
-				$sql = "INSERT INTO $dbname.$table (setid,destination,weight,description) VALUES ('1','sip:".$freeswitch['host'].":5060','".$freeswitch['weight']."','".$freeswitch['description']."')";
+			foreach ( $resultFS as $key => $server ) {
+				$sql = "INSERT INTO $dbname.$table (setid,destination,weight,description) VALUES ('1','sip:".$server['host'].":5060','".$server['weight']."','".$server['description']."')";
 				$con->createCommand( $sql )->execute();
 
 			}

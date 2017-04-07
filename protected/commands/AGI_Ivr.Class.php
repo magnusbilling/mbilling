@@ -37,6 +37,8 @@ class AGI_Ivr
 		$agi->verbose($sql,1);
 
 		$username    = $resultUser[0]['username'];
+		$MAGNUS->id_user = $resultUser[0]['id'];
+		$MAGNUS->id_plan = $resultUser[0]['id_plan']; 
 		$MAGNUS->record_call    = $resultUser[0]['record_call'];      
 		$monFriStart = $result[0]['monFriStart'];
 		$monFriStop  = $result[0]['monFriStop'];
@@ -99,11 +101,17 @@ class AGI_Ivr
 				$continue = false;
 				break;
 			}
+
 			$audio = "/var/www/html/mbilling/resources/sounds/".$audioURA.$result_did[0]['id_ivr'];
-			$res_dtmf = $agi->get_data($audio, 3000, 1);
-			$agi->verbose( print_r($res_dtmf, true),5);
-			$option = $res_dtmf['result'];
-			$agi->verbose( 'option'. $option);
+			if (file_exists($audio.".gsm") || file_exists($audio.".wav")) {				
+				$res_dtmf = $agi->get_data($audio, 3000, 1);
+				$option = $res_dtmf['result'];
+			}else{
+				$agi->verbose( 'NOT EXIST AUDIO TO IVR DEFAULT OPTION '.$audio,5);
+				$option = '10';
+				$continue = false;
+			}
+			$agi->verbose( 'option'. $option,10);
 			//se nao marcou
 			if (strlen($option) < 1) 
 			{

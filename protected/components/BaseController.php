@@ -88,4 +88,38 @@ class BaseController extends CController
 			Yii::app()->language = Yii::app()->sourceLanguage = isset($_SESSION['language']) ? $_SESSION['language']  : Yii::app()->language;
 		}
 	}
+
+	public function number_translation($translation,$destination)
+    	{
+		#match / replace / if match length 
+		#0/54,4/543424/7,15/549342/9
+
+		//$translation = "0/54,*/5511/8,15/549342/9";   
+    
+		$regexs = preg_split("/,/", $translation);
+
+		foreach ($regexs as $key => $regex) {
+
+		$regra = preg_split( '/\//', $regex );
+		$grab = isset($regra[0]) ? $regra[0] : '';
+		$replace = isset($regra[1]) ? $regra[1] : '';
+		$digit = isset($regra[2]) ? $regra[2] : '';		    
+
+		$number_prefix = substr($destination,0,strlen($grab));
+
+		if ($grab == '*' && strlen($destination) == $digit) {
+			$destination = $replace.$destination;
+		}
+		else if (strlen($destination) == $digit && $number_prefix == $grab) {
+			$destination = $replace.substr($destination,strlen($grab));
+		}
+		elseif ($number_prefix == $grab)
+		{
+			$destination = $replace.substr($destination,strlen($grab));
+		}      
+
+  
+        	}
+ 		return $destination;
+    	}
 }

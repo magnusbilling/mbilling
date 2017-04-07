@@ -35,7 +35,7 @@
  * 15/04/2013
  */
 
-class GroupUser extends CActiveRecord
+class GroupUser extends Model
 {
 	protected $_module = 'groupuser';
 	/**

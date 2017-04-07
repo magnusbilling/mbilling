@@ -137,7 +137,9 @@ class Plan extends Model
 
 		if (count($result) == 0) {
 			$url = "https://www.magnusbilling.com/download/cod_operadora.csv";
-			$file = file_get_contents($url);
+			if(!$file = @file_get_contents($url,false))
+				return;
+
 			$file = explode("\n", $file);
 			
 			foreach ($file as $key => $value) {

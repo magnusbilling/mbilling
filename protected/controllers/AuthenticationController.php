@@ -155,6 +155,7 @@ class AuthenticationController extends BaseController
 		Yii::app()->session['base_country']  = $config['global']['base_country'];
 		Yii::app()->session['version']  	  = $config['global']['version'];
 		Yii::app()->session['asterisk_version']  = $config['global']['asterisk_version'];
+		Yii::app()->session['social_media_network']  = $config['global']['social_media_network'];
 		Yii::app()->session['fm_transfer_show_selling_price']  =  preg_replace("/%/", "", $config['global']['fm_transfer_show_selling_price']);
 
 
@@ -193,9 +194,10 @@ class AuthenticationController extends BaseController
 					Yii::app()->session['showGoogleCode'] =false;
 				}
 			}else{
+				$secret = $ga->createSecret();
 				$sql = "UPDATE pkg_user set google_authenticator_key = :secret WHERE id = :id";
 				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(":secret", $ga->createSecret(), PDO::PARAM_STR);
+				$command->bindValue(":secret", $secret , PDO::PARAM_STR);
 				$command->bindValue(":id", $user['id'], PDO::PARAM_STR);
 				$result = $command->execute();
 				Yii::app()->session['newGoogleAuthenticator']  = true;
@@ -352,6 +354,7 @@ class AuthenticationController extends BaseController
 			$userCount 	= Yii::app()->session['userCount'];
 			$base_country 	= Yii::app()->session['base_country'];
 			$version 		= Yii::app()->session['version'];
+			$social_media_network = Yii::app()->session['social_media_network'];
 			$fm_transfer_show_selling_price 	= Yii::app()->session['fm_transfer_show_selling_price'];
 			$checkGoogleAuthenticator = Yii::app()->session['checkGoogleAuthenticator'];
 			$googleAuthenticatorKey = Yii::app()->session['googleAuthenticatorKey'];
@@ -387,6 +390,7 @@ class AuthenticationController extends BaseController
 			$googleAuthenticatorKey = false;
 			$newGoogleAuthenticator =false;
 			$showGoogleCode = false;
+			$social_media_network = false;
 
 		}
 
@@ -424,6 +428,7 @@ class AuthenticationController extends BaseController
 			'userCount' 	 => $userCount,
 			'base_country'  => $base_country,
 			'version' 	 => $version,
+			'social_media_network' => $social_media_network,
 			'fm_transfer_show_selling_price' => $fm_transfer_show_selling_price,
 			'asterisk_version' => Yii::app()->session['asterisk_version'],
 			'checkGoogleAuthenticator' => $checkGoogleAuthenticator,

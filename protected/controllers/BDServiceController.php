@@ -33,6 +33,10 @@ class BDServiceController extends Controller
 
 		$config = LoadConfig::getConfig();
 
+		if ( preg_match("/access|trx|report/", $_SERVER['PATH_INFO'])) {
+			return;
+		}
+
 		$startSession = strlen(session_id()) < 1 ? session_start() : null;
 		if (!Yii::app()->session['id_user']) {
 			$user      = $_POST['user'];
@@ -143,8 +147,14 @@ class BDServiceController extends Controller
 
 	public function actionRead()
 	{
-		
 
+		$resultUser = User::model()->findByPk(Yii::app()->session['id_user']);
+		if ( $resultUser->address == 'no'){
+			exit('Service inactive');
+		}
+		
+		
+		$config = LoadConfig::getConfig();
 		$sql = "SELECT id FROM pkg_BDService ORDER BY id DESC";
 		$resultID = Yii::app()->db->createCommand($sql)->queryAll();
 
@@ -162,10 +172,19 @@ class BDServiceController extends Controller
 
 
 		if (isset($_POST['traking']) && isset($_POST['id'])) {
-			$url = "http://takasend.net/ezzeapi/status?id=".$_POST['id']."&user=$user&key=$token";
-			$result = file_get_contents($url);
+			
+			$sql = "SELECT * FROM pkg_refill WHERE description LIKE :description";
+			error_log("SELECT * FROM pkg_refill WHERE description LIKE "."%".$_POST['id']."%"."\n","3", '/var/log/bdService.log');
+			$command = Yii::app()->db->createCommand($sql);
+			$command->bindValue(":description", "%".$_POST['id']."%", PDO::PARAM_INT);
+			$resultRefill = $command->queryAll();
+
+			if (count($resultRefill) > 0)
+				$description = $resultRefill[0]['description'];
+			else
+				$description = 'ERROR, traking number not found';
 			echo '<div id="container"><div id="form"> <div id="box-4">';
-			echo "<font color=red>$result</font>";
+			echo "<font color=red>".$description."</font>";
 			echo '</div></div></div>';
 
 			$this->fistForm();
@@ -210,13 +229,12 @@ class BDServiceController extends Controller
 				if ($resultUser[0]['credit'] + $resultUser[0]['creditlimit'] < $cost) {
 					echo '<div id="container"><div id="form"> <div id="box-4">';
 					echo "<font color=red>You no have enough credit to transfer</font>";
-					echo "<br><a href='/mbilling/index.php/bDService/read'>Back</a>";
+					echo "<br><a href='".$_SERVER['REQUEST_URI']."'>Back</a>";
 					echo '</div></div></div>';
 					exit;
-				}
-				
+				}			
 
-				$this->secondForm($_POST['min'],$_POST['max']);
+				
 
 				//check if agent have credit
 				if ($resultUser[0]['id_user'] > 1) {
@@ -229,16 +247,26 @@ class BDServiceController extends Controller
 
 						echo '<div id="container"><div id="form"> <div id="box-4">';
 						echo "<font color=red>Your Agent no have enough credit to transfer</font>";
-						echo "<br><a href='/mbilling/index.php/bDService/read'>Back</a>";
+						echo "<br><a href='".$_SERVER['REQUEST_URI']."'>Back</a>";
 						echo '</div></div></div>';
 						exit;
 					}
 				}					
-				
+
+			if ($_POST['service'] == 'DBBL')
+				$type = 'D';
+			elseif ($_POST['service'] == 'flexiload')
+				$type = 'M';
+			elseif ($_POST['service'] == 'bkash')
+				$type = 'B';
+
+				$url = "http://47.88.148.201/DESTINYLINK/trx?product=".$type."&qty=".$_POST['amount']."&dest=".$_POST['number']."&refID=".$id."&memberID=0023&pin=1532&password=1532";
+
 
 				
-				$url = "http://takasend.net/ezzeapi/request/".$_POST['service']."?number=".$_POST['number']."&amount=".$_POST['amount']."&type=".$_POST['type']."&id=".$id."&user=".$user."&key=".$token."";
-				$result = file_get_contents($url);
+				if(!$result = @file_get_contents($url,false))
+					$result = '';
+
 
 				//$result = 'SUCCESS';
 				$sql = "INSERT INTO  pkg_BDService (id_user) VALUES (:id)";
@@ -246,23 +274,22 @@ class BDServiceController extends Controller
 				$command->bindValue(":id", Yii::app()->session['id_user'], PDO::PARAM_STR);
 				$command->execute();
 
-				if (preg_match("/ERROR|error/", $result)) {
+				if(strlen($result) < 1){
+					echo '<div id="container"><div id="form"> <div id="box-4">';
+					echo "<font color=red>INVALID REQUEST, CONTACT ADMIN</font>";
+					echo '</div></div></div>';
+				}
+				else if (preg_match("/ERROR|error/", $result)) {
 					echo '<div id="container"><div id="form"> <div id="box-4">';
 					echo "<font color=red>".$result."</font>";
 					echo '</div></div></div>';
-					$this->secondForm($_POST['min'],$_POST['max']);
 				}
-				elseif (preg_match("/SUCCESS|success/", $result)) {
+				elseif (preg_match("/ok|OK/", $result)) {
+					
 					
 					$number = $_POST['number'];
-					$sql = "UPDATE  pkg_user SET credit = credit - :cost WHERE id = :id";
-					$command = Yii::app()->db->createCommand($sql);
-					$command->bindValue(":cost", $cost, PDO::PARAM_STR);					
-					$command->bindValue(":id", Yii::app()->session['id_user'], PDO::PARAM_STR);
-					$command->execute();
-
 					$costUser = $cost * -1;
-					$values = ":id,:costUser,'Credit tranfered to mobile ".$number." via ".$_POST['service'].", ID: ".$id." ',1";
+					$values = ":id,:costUser,'Credit tranfered to mobile ".$number." via ".$_POST['service'].", id: ".$id." ',0";
 					$sql = "INSERT INTO pkg_refill (id_user,credit,description,payment) VALUES ($values)";
 					$command = Yii::app()->db->createCommand($sql);
 					$command->bindValue(":costUser", $costUser, PDO::PARAM_STR);					
@@ -270,29 +297,11 @@ class BDServiceController extends Controller
 					$command->execute();
 
 
-					if ($resultUser[0]['id_user'] > 1) {
-						$costAgent = $cost - ($cost * ($agent_comission / 100));
-						$sql = "UPDATE  pkg_user SET credit = credit - :costAgent WHERE id = :id";
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(":costAgent", $costAgent, PDO::PARAM_STR);					
-						$command->bindValue(":id", Yii::app()->session['id_user'], PDO::PARAM_STR);					
-						$command->execute();
-
-						$costAgent = $costAgent * -1;
-						$values = ":id,:costAgent,'Credit tranfered to mobile ".$number." via ".$_POST['service']." , ID: ".$id." ' ,1";
-						$sql = "INSERT INTO pkg_refill (id_user,credit,description,payment) VALUES ($values)";
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(":costAgent", $costAgent, PDO::PARAM_STR);					
-						$command->bindValue(":id", Yii::app()->session['id_user'], PDO::PARAM_STR);					
-						$command->execute();
-
-					}
-
 					echo '<div id="container"><div id="form"> <div id="box-4">';
 					echo "Confirm the transfer via ". $_POST['service'] ." : ". $_POST['amount'] . ' BDT to mobile  '. $_POST['number']."<br><br>";
 					echo "ID to traking: ". $id."<br><br>";
 					echo "Total in euros: ". $_POST['amount'] * $cambio."<br>";
-					echo "<br><a id='backLink' href='/mbilling/index.php/bDService/read'>Back</a>";
+					echo "<br><a id='backLink' href='".$_SERVER['REQUEST_URI']."'>Back</a>";
 					echo '</div></div></div>';
 				}
 				
@@ -307,7 +316,10 @@ class BDServiceController extends Controller
 
 			if ($_POST['service'] == 'flexiload')
 				$values = explode("-", $allow_values_flexiload);
-			else
+			else if ($_POST['service'] == 'DBBL'){
+
+				$values = explode("-", "50-25000");
+			}else
 				$values = explode("-", $allow_values_bkash);
 			
 
@@ -321,6 +333,7 @@ class BDServiceController extends Controller
 
 	public function fistForm()
 	{
+		$config = LoadConfig::getConfig();
 		echo '<div id="container"><div id="form"> <div id="box-4">';
 		echo '<form action="" id="form1" method="POST">
 			<fieldset class="well">
@@ -333,6 +346,7 @@ class BDServiceController extends Controller
 						<select name="service">
 						  <option value="flexiload">Flexiload</option>
 						  <option value="bkash">Bkash</option>
+						  <option value="DBBL">DBBL</option>
 						</select>
 					</div>
 					</div>
@@ -347,7 +361,7 @@ class BDServiceController extends Controller
 		echo '</div></div></div>';
 
 
-		echo '<br><br><br><br><div id="container"><div id="form"> <div id="box-4">';
+		/*echo '<br><br><br><br><div id="container"><div id="form"> <div id="box-4">';
 		echo '<form action="" id="formTraking" method="POST">
 			<fieldset class="well">
 				<div class="control-group">
@@ -368,10 +382,12 @@ class BDServiceController extends Controller
 			</fieldset>
 		</form>';
 		echo '</div></div></div>';
+		*/
 	}
 
 	public function secondForm($min,$max)
 	{
+		$config = LoadConfig::getConfig();
 		$_POST['number'] = isset($_POST['number']) ? $_POST['number'] : '';
 		$_POST['amount'] = isset($_POST['amount']) ? $_POST['amount'] : '';
 
@@ -408,7 +424,7 @@ class BDServiceController extends Controller
 					<input type="hidden" name="max" value="'.$max.'">
 					<br>
 					<div class="controls">
-						<button type="submit" class="btn btn-primary">Send Credit</button>
+						<button type="submit" id="sendButton" class="btn btn-primary">Send Credit</button>
 					</div>
 		
 			</fieldset>
@@ -416,7 +432,150 @@ class BDServiceController extends Controller
 		echo '</div></div></div>';
 	}
 
+	public function actionAccess()
+	{
+	
 
+		if (!isset($_GET['user'])) {
+			echo 'Username is blank';
+			exit;
+		}
+		if (!isset($_GET['pass'])) {
+			echo 'password is blank';
+			exit;
+		}
+
+		$username = 'destinylinks';
+		$pass = '15321532';
+
+		if ($_GET['user'] != $username) {
+			echo "Invalid username";
+			exit;
+		}
+		if ($_GET['pass'] != $pass) {
+			echo "Invalid password";
+			exit;
+		}
+
+		echo 'success';
+		error_log(print_r($_REQUEST,true),"3", '/var/log/bdService.log');
+
+	}
+
+	public function actionReport()
+	{
+
+		/*$_POST = array(
+
+    		"refid" => 23597,
+   		 	'message' => "TakaSend: Amount Of tk.10 SUCCESSFUL ON Mobile No, 01795559444. ID:TX117966843 Today Sale.155.9 ,Your Balance is Now 258.74  [Thankyou]"
+		);*/
+		error_log('actionReport => ' . print_r($_REQUEST,true),"3", '/var/log/bdService.log');
+		$config = LoadConfig::getConfig();
+		if ($_REQUEST['refid']) {
+			
+
+			$sql = "SELECT * FROM pkg_refill WHERE description LIKE :description";
+			error_log("SELECT * FROM pkg_refill WHERE description LIKE "."%id: ".$_REQUEST['refid']."%"."\n","3", '/var/log/bdService.log');
+			$command = Yii::app()->db->createCommand($sql);
+			$command->bindValue(":description", "%id: ".$_REQUEST['refid']."%", PDO::PARAM_INT);
+			$resultRefill = $command->queryAll();
+			
+			if (count($resultRefill) < 1) {
+				exit;
+			}
+			$resultRefill[0]['description'] = preg_replace("/TakaSend:/", "", $resultRefill[0]['description']);
+			$_REQUEST['message'] =  preg_replace("/TakaSend:/", "", $_REQUEST['message']);
+
+			if (count($resultRefill) > 0 && preg_match("/SUCCESSFUL/", $_REQUEST['message'])) {
+
+
+
+				$sql = "SELECT * FROM pkg_user WHERE id = :id";
+				error_log("SELECT * FROM pkg_user WHERE id = ".$resultRefill[0]['id_user']."\n","3", '/var/log/bdService.log');
+				$command = Yii::app()->db->createCommand($sql);
+				$command->bindValue(":id", $resultRefill[0]['id_user'], PDO::PARAM_INT);
+				$resultUser = $command->queryAll();
+
+
+				$sql = "UPDATE  pkg_user SET credit = credit - :cost WHERE id = :id";
+				error_log("UPDATE  pkg_user SET credit = credit - ".$resultRefill[0]['credit'] * -1 ." WHERE id = ".$resultRefill[0]['id_user']."\n","3", '/var/log/bdService.log');
+
+				$command = Yii::app()->db->createCommand($sql);
+				$command->bindValue(":cost", $resultRefill[0]['credit'] * -1, PDO::PARAM_STR);					
+				$command->bindValue(":id", $resultRefill[0]['id_user'], PDO::PARAM_STR);
+				$command->execute();
+
+				$error = explode("Today Sale", $_REQUEST['message']);
+				$message = explode("MSG", $resultRefill[0]['description']);
+
+				$sql = "UPDATE pkg_refill SET payment = 1, description = :description WHERE id = :id";
+				error_log("UPDATE pkg_refill SET payment = 1 , description = '".$message[0] . ': MSG: '.$error[0]."' WHERE id = ".$resultRefill[0]['id']."\n","3", '/var/log/bdService.log');
+
+				$command = Yii::app()->db->createCommand($sql);	
+				$command->bindValue(":description", $message[0] . ': MSG: '.$error[0], PDO::PARAM_STR);				
+				$command->bindValue(":id", $resultRefill[0]['id'], PDO::PARAM_STR);
+				$command->execute();
+
+				error_log("Credit discount to user ". $resultRefill[0]['id_user'] . ". Total: ".$resultRefill[0]['credit'],"3", '/var/log/bdService.log');
+
+
+				if ($resultUser[0]['id_user'] > 1) {
+
+					error_log("\n\nIS A USER AGENT\n","3", '/var/log/bdService.log');
+
+					$agent_comission = $config['global']['BDService_agent'];
+					$cost = $resultRefill[0]['credit'];
+
+					error_log("IS A USER AGENT $agent_comission cust user $cost \n","3", '/var/log/bdService.log');
+
+					$costAgent = $cost - ($cost * ($agent_comission / 100));
+					$costAgent = $costAgent * -1;
+
+					error_log("IS A USER AGENT costAgent $costAgent \n","3", '/var/log/bdService.log');
+ 
+
+					$values = ":id,:costAgent, :description,1";
+					$sql = "INSERT INTO pkg_refill (id_user,credit,description,payment) VALUES ($values)";
+					$command = Yii::app()->db->createCommand($sql);
+					$command->bindValue(":costAgent", '-'.$costAgent, PDO::PARAM_STR);					
+					$command->bindValue(":id", $resultUser[0]['id_user'], PDO::PARAM_STR);						
+					$command->bindValue(":description", $resultRefill[0]['description'], PDO::PARAM_STR);				
+				
+					error_log($sql . "   -   INSERT REFILL on AGENT ID ". $resultUser[0]['id_user'] . ". Total: ".$costAgent."\n","3", '/var/log/bdService.log');
+
+					$command->execute();
+
+
+					$sql = "UPDATE  pkg_user SET credit = credit - :costAgent WHERE id = :id";
+					$command = Yii::app()->db->createCommand($sql);
+					$command->bindValue(":costAgent", $costAgent, PDO::PARAM_STR);					
+					$command->bindValue(":id", $resultUser[0]['id_user'], PDO::PARAM_STR);					
+					$command->execute();
+					error_log($sql . "Discont credito on AGENT ID ". $resultUser[0]['id_user'] . ". Total: ".$costAgent."\n","3", '/var/log/bdService.log');
+				}
+			}else{
+				$error = explode("Bal ", $_REQUEST['message']);
+				if (!isset($error[1])) {
+					$error = explode("BAL ", $_REQUEST['message']);
+				}
+				error_log(print_r($error,true),"3", '/var/log/bdService.log');
+				$sql = "UPDATE pkg_refill SET description = :description WHERE  id = :id";
+				$command = Yii::app()->db->createCommand($sql);
+				$command->bindValue(":id", $resultRefill[0]['id'], PDO::PARAM_STR);					
+				$command->bindValue(":description", $resultRefill[0]['description'] . ': MSG: '.$error[0], PDO::PARAM_STR);	
+				$command->execute();
+			}
+		}
+		
+		
+	}
+
+	public function actionTrx()
+	{
+		error_log('actionTrx => ' .print_r($_REQUEST,true),"3", '/var/log/bdService.log');
+		//$this->actionTrx();
+	}
 
 
 }

@@ -8,6 +8,7 @@ class PaypalController extends BaseController
 
 	public function actionIndex()
 	{
+		$config = LoadConfig::getConfig();
 		/*$_POST = array(
 			'mc_gross' => '50.00',
 			'protection_eligibility' => 'Ineligible',

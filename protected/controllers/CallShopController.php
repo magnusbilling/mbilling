@@ -107,7 +107,7 @@ class CallShopController extends Controller
         Yii::app()->db->createCommand($sql)->execute();
 
         $sql = "UPDATE pkg_sip SET callshopnumber= NULL, callshoptime = 0";
-        Yii::app()->db->createCommand($sql)->execute();
+        //Yii::app()->db->createCommand($sql)->execute();
 
         if ($arr[0] != "")
         {            
@@ -147,6 +147,8 @@ class CallShopController extends Controller
                     {
                         $arr3 = explode("State:", $temp2);
                         $status = trim(rtrim($arr3[1]));
+                    }else{
+                        $status = '';
                     }
 
                     
@@ -184,29 +186,33 @@ class CallShopController extends Controller
 
                 $id_user = isset($resultUser[0]['id']) ? $resultUser[0]['id'] : false;
 
+
                 $status = explode(" ", (string)$status);               
 
-                if (preg_match("/billing/", $linha[1])  && $ndiscado != '(N/A)' && $status[0] != 'Down' && is_numeric($ndiscado))
+                if (preg_match("/billing/", $linha[1])  && isset($ndiscado) && $ndiscado != '(N/A)' && $status[0] != 'Down' && is_numeric($ndiscado) && !is_null($ramal))
                 {
                     if(isset($resultUser[0]['callshop']) && $resultUser[0]['callshop'] == 1){
       
 
                         $sql = "UPDATE pkg_sip SET status = 3, callshopnumber = :ndiscado, callshoptime = :seconds 
-                                            WHERE name = :ramal ";
+                                            WHERE name = :name ";
                         $command = Yii::app()->db->createCommand($sql);
                         $command->bindValue(":ndiscado", $ndiscado, PDO::PARAM_STR);
                         $command->bindValue(":seconds", $seconds, PDO::PARAM_STR);
                         $command->bindValue(":name", $ramal, PDO::PARAM_STR);
-                        $command->execute();
+                        $command->execute();                    
+                       
 
-                        $sql = "SELECT id FROM pkg_prefix WHERE prefix = SUBSTRING(:ndiscado,1,length(prefix)) 
+                        $sql = "SELECT id FROM pkg_prefix WHERE prefix = SUBSTRING('$ndiscado',1,length(prefix)) 
                                 ORDER BY LENGTH(prefix) DESC LIMIT 1";
+
+
                         $command = Yii::app()->db->createCommand($sql);
                         $command->bindValue(":ndiscado", $ndiscado, PDO::PARAM_STR);
                         $resultPrefix = $command->queryAll();
 
                         
-
+           
                         $columm = "sessionid, id_user, id_prefix, status, price, calledstation, cabina, sessiontime";
                         $values = ":sessionid, :id_user, :id_prefix, '3', 0, :ndiscado, :ramal, :seconds";
                         $sql = "INSERT INTO pkg_callshop ($columm) VALUES ( $values )";
@@ -217,7 +223,10 @@ class CallShopController extends Controller
                         $command->bindValue(":ndiscado", $ndiscado, PDO::PARAM_STR);
                         $command->bindValue(":ramal", $ramal, PDO::PARAM_STR);
                         $command->bindValue(":seconds", $seconds, PDO::PARAM_STR);
-                        $command->execute();                
+                        $command->execute(); 
+                        
+                        
+                                       
                     }
                 }
 

@@ -83,8 +83,8 @@ class AGI_Authenticate
             $MAGNUS->username = $MAGNUS->accountcode;
 
             $sql = "SELECT credit, id_plan, active, typepaid, creditlimit, language, removeinterprefix, ".
-                    "redial, enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays, ".
-                    "UNIX_TIMESTAMP(a.creationdate), a.id, a.restriction, a.id_user, ".
+                    "redial, enableexpire, UNIX_TIMESTAMP(expirationdate) expirationdate, expiredays, ".
+                    "UNIX_TIMESTAMP(a.creationdate) creationdate, a.id, a.restriction, a.id_user, ".
                     "a.callshop, a.id_offer, a.record_call, a.prefix_local, a.country ".
                     "FROM pkg_user AS a ".
                     "LEFT JOIN pkg_plan ON id_plan=pkg_plan.id WHERE username='" . $MAGNUS->username . "'";
@@ -467,7 +467,7 @@ class AGI_Authenticate
            
         }
         
-        $MAGNUS->play_audio     = $resultPlayAudio[0]['play_audio']; 
+        $MAGNUS->play_audio     = isset($resultPlayAudio[0]['play_audio']) ? $resultPlayAudio[0]['play_audio'] : false; 
        
 
         if (strlen($language) > 1 )
@@ -533,8 +533,9 @@ class AGI_Authenticate
                 $agi->verbose( "CABINA DISABLED " . $ramal,3); 
                 return -1;
             }
-        }        
-        $agi->username = $MAGNUS->username;
+        }
+        if(isset($agi->username))        
+            $agi->username = $MAGNUS->username;
         return $res;
     }
     

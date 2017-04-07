@@ -202,7 +202,7 @@ class JoomlaController extends BaseController
 
 		if (isset($is_android)) {
 			//echo $idUser;
-			$mail = new Mail(Mail::$TYPE_SIGNUP, $id);
+			$mail = new Mail(Mail::$TYPE_SIGNUP, $idUser);
 			$mail->send();
 			include("protected/commands/AGI.Class.php");
 			$asmanager = new AGI_AsteriskManager;

@@ -48,7 +48,7 @@ class AGI_Queue
 
        	$agi->set_variable('CHANNEL(language)', $resultQueue[0]['language']);
 
-       	$agi->execute("Queue",$QueueName.',tc,,,,magnus');
+       	$agi->execute("Queue",$QueueName.',tc,,,,/var/www/html/mbilling/agi.php');
 		if ($MAGNUS->agiconfig['record_call'] == 1 || $MAGNUS->record_call == 1)
     	{      		
        		$myres = $agi->execute("StopMixMonitor");

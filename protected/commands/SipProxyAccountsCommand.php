@@ -75,7 +75,8 @@ class SipProxyAccountsCommand extends CConsoleCommand
 			$con->createCommand( $sql )->execute();
 
 			foreach ($resultSips as $key => $sip) {
-				$sql = "INSERT INTO $dbname.$table (username,domain,password,accountcode) VALUES ('".$sip['defaultuser']."', '$hostname','".$sip['secret']."', '".$sip['accountcode']."')";
+
+				$sql = "INSERT INTO $dbname.$table (username,domain,ha1,accountcode) VALUES ('".$sip['defaultuser']."', '$hostname','".md5($sip['defaultuser'].':'.$hostname.':'.$sip['secret'] )."', '".$sip['accountcode']."')";
 				$con->createCommand( $sql )->execute();
 			}			
 			

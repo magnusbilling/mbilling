@@ -80,7 +80,7 @@ class CallSummaryPerUserController extends Controller
 
     public function init()
     {
-        $config = LoadConfig::getConfig();
+        
         $this->instanceModel = new CallSummaryPerUser;
         $this->abstractModel = CallSummaryPerUser::model();
         $this->titleReport   = Yii::t('yii','Calls Summary');
@@ -179,8 +179,9 @@ class CallSummaryPerUserController extends Controller
     public function extraFilter ($filter)
     {
 
-        $filter = $this->filterReplace($filter);      
+        $config = LoadConfig::getConfig();
 
+        $filter = $this->filterReplace($filter);
 
         //is agent, get only agent customers
         if(Yii::app()->getSession()->get('user_type')  == 2)

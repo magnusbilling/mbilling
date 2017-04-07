@@ -19,9 +19,9 @@
  * 19/09/2012
  */
 
-class Firewall extends CActiveRecord
+class Firewall extends Model
 {
-
+	protected $_module = 'firewall';
 	public static function model( $className=__CLASS__ ) {
 		return parent::model( $className );
 	}

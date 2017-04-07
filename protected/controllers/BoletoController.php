@@ -50,7 +50,7 @@ class BoletoController extends Controller
 		$banco = $values['banco'];
 
 
-		$uploaddir = "tmp/";
+		$uploaddir = "/var/www/tmpmagnus/";
 		$uploadfile = $uploaddir .date('ymdhis').$_FILES["file"]["name"];
 		move_uploaded_file($_FILES["file"]["tmp_name"], $uploadfile);
 

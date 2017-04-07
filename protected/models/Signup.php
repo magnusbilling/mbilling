@@ -18,7 +18,7 @@
  * Magnusbilling.com <info@magnusbilling.com>
  * 19/09/2012
  */
- class Signup extends CActiveRecord
+ class Signup extends Model
  {
  	public $verifyCode;
  	public $password2;

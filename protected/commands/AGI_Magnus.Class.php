@@ -214,7 +214,8 @@ class Magnus
         $this->destination = preg_replace("/\)/", "", $this->destination);
         $this->dnid = preg_replace("/\)/", "", $this->dnid);    
 
-
+       
+        
         if (strlen($this->destination) <= 2 && is_numeric($this->destination) && $this->destination >= 0)
         {
             $sql = "SELECT phone FROM pkg_speeddial WHERE id_user='" . $this->id_user . "' AND speeddial='" . $this->destination . "'";
@@ -342,7 +343,11 @@ class Magnus
 
         $agi->destination = $this->destination;
         /*call funtion for search rates*/
-        $resfindrate = SearchTariff::find($this, $agi, $Calc);        
+        $SearchTariff = new SearchTariff();
+        $resfindrate = $SearchTariff->find($this->destination, $this->id_plan, $this->id_user, $agi);
+
+        $Calc->tariffObj = $resfindrate;
+        $Calc->number_trunk = count( $resfindrate );       
 
         if ($resfindrate == 0)
         {
@@ -364,13 +369,11 @@ class Magnus
         }
         else
         {
-            $agi->verbose( "NUMBER TARIFF FOUND -> " . $resfindrate,10);
+            $agi->verbose( "NUMBER TARIFF FOUND -> " . $Calc->number_trunk,10);
         }
 
         /* CHECKING THE TIMEOUT*/
-        $agi->verbose( $this->credit . $resfindrate,10);
         $res_all_calcultimeout = $Calc->calculateAllTimeout($this, $this->credit,$agi);
-        $agi->verbose( "NUMBER TARIFF FOUND -> " . $resfindrate,10);
 
         if($this->id_agent > 1)
         {
@@ -1433,8 +1436,8 @@ class Magnus
     
             $regra = split( '/', $regex );
             $grab = $regra[0];
-            $replace = $regra[1];
-            $digit =$regra[2];
+            $replace = isset($regra[1]) ? $regra[1] : '';
+            $digit =    isset($regra[2]) ? $regra[2] : '';
                         
             $agi->verbose("Grab :$grab Replacement: $replace Phone Before: $destination",25);
             

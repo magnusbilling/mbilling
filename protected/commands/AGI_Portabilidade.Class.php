@@ -52,7 +52,10 @@ class Portabilidade
                     $pass = $MAGNUS->config['global']['portabilidadePassword'];
                     $url = "http://magnusbilling.com/portabilidade/consulta_numero.php?user=".$user."&pass=".$pass."&seache_number=" . $number . "";
                     $agi->verbose($url,25);
-                    $operadora = file_get_contents($url);
+
+                    if(!$operadora = @file_get_contents($url,false)) {
+                        $operadora = '55999';
+                    }
                     $company = str_replace("55", "", $operadora);
                     $number = "1111" . $company . $number;
                 }

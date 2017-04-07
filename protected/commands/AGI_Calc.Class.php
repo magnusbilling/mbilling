@@ -548,7 +548,7 @@ class Calc
 
             if ($MAGNUS->callshop == 1)
             {
-                $sql = "SELECT dialprefix, destination, buyrate, minimo, block FROM pkg_rate_callshop WHERE dialprefix = SUBSTRING('$calledstation',1,length(dialprefix)) and id_user=$MAGNUS->id_user ORDER BY LENGTH(dialprefix) DESC";
+                $sql = "SELECT dialprefix, destination, buyrate, minimo, block, minimal_time_charge FROM pkg_rate_callshop WHERE dialprefix = SUBSTRING('$calledstation',1,length(dialprefix)) and id_user=$MAGNUS->id_user ORDER BY LENGTH(dialprefix) DESC";
                 $resultCallShop = Yii::app()->db->createCommand( $sql )->queryAll();
                 $agi->verbose($sql,25);
 
@@ -557,6 +557,13 @@ class Calc
                 $increment = $resultCallShop[0]['block'];
 
                 $sellratecost_callshop = $MAGNUS->calculation_price($buyrate, $sessiontime, $initblock, $increment);
+
+                if ( $sessiontime < $resultCallShop[0]['minimal_time_charge'])
+                {
+                    $agi->verbose("Minimal time to charge. Cost 0.0000",15);
+                    $sellratecost_callshop = 0;
+                }
+
 
                 $cabina = explode("-", $MAGNUS->channel);
                 $cabina = explode("/", $cabina[0]);

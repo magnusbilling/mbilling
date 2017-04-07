@@ -3,22 +3,22 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="UTF-8">
-    <meta name="description" content="MBilling, the best free billing to voip provider to Asterisk." />
+    <meta name="description" content="MagnusBilling, the best free billing to voip provider to Asterisk." />
     <link rel="shortcut icon" href="resources/images/logo.ico" type="image/x-icon" />
-    <title>MBilling</title>
+    <title>MagnusBilling</title>
     <script src="locale.js"></script>
     <script src="icons.js"></script>
     <script src="index.php"></script>
     <link rel="stylesheet" href="resources/init.css">
 </head>
 <body>
-  <script type="text/javascript">
-      window.theme = window.theme || 'blue-classic';
-      window.themeApp = window.theme;
-      window.isThemeNeptune = window.theme.indexOf('neptune') !== -1;
-      window.isThemeCrisp = window.theme.indexOf('crisp') !== -1;
-      window.isThemeClassic = !window.isThemeNeptune && !window.isThemeCrisp;
-      window.layout=0;
+    <script type="text/javascript">
+        window.theme = window.theme || 'blue-classic';
+        window.themeApp = window.theme;
+        window.isThemeNeptune = window.theme.indexOf('neptune') !== -1;
+        window.isThemeCrisp = window.theme.indexOf('crisp') !== -1;
+        window.isThemeClassic = !window.isThemeNeptune && !window.isThemeCrisp;
+        window.layout=0;
     </script>
 
    	<div id="loading-mask"></div>
@@ -35,18 +35,15 @@
 
 	<script type="text/javascript">
 
-    var defaultLang= localStorage.getItem('lang') && localStorage.getItem('lang') != 'undefined' ? localStorage.getItem('lang') : localStorage.lang = window.lang;
-
-    var lang = defaultLang,
-      localeApp = 'resources/locale/' + lang + '.js';
-
-    document.write('<script type="text/javaScript" src="'+ localeApp +'"></'+'script>');
+        var defaultLang= localStorage.getItem('lang') && localStorage.getItem('lang') != 'undefined' ? localStorage.getItem('lang') : localStorage.lang = window.lang;
+        var lang = defaultLang, localeApp = 'resources/locale/' + lang + '.js';
+        document.write('<script type="text/javaScript" src="'+ localeApp +'"></'+'script>');
     </script>
 
     <script type="text/javascript">
-      document.getElementById('name-system').innerHTML = t('System') + ' MBilling';
-      document.getElementById('text-msg').innerHTML = 'Voip System';
-      document.getElementById('loading-msg').innerHTML = t('Loading...');
+        document.getElementById('name-system').innerHTML ='MagnusBilling';
+        document.getElementById('text-msg').innerHTML = 'Voip System';
+        document.getElementById('loading-msg').innerHTML = t('Loading...');
     </script>  
 
 
@@ -62,7 +59,9 @@
             window.isTablet = !tags.desktop;        
             if(!tags.desktop) {
               theme = 'blue-crisp-touch';
-            } Ext.manifest = theme; Ext.microloaderTags = tags; Ext.Boot.platformTags = Ext.platformTags || {};};</script><script id="microloader" data-app="ef2366d7-189a-4526-baac-e91d30e5bc33" type="text/javascript">var Ext=Ext||{};Ext.manifest=Ext.manifest||"blue-neptune.json";Ext=Ext||{};
+            } Ext.manifest = theme; Ext.microloaderTags = tags; Ext.Boot.platformTags = Ext.platformTags || {};};
+    </script>
+    <script id="microloader" data-app="ef2366d7-189a-4526-baac-e91d30e5bc33" type="text/javascript">var Ext=Ext||{};Ext.manifest=Ext.manifest||"blue-neptune.json";Ext=Ext||{};
 Ext.Boot=Ext.Boot||function(n){function m(a){if(a.$isRequest)return a;a=a.url?a:{url:a};var b=a.url,b=b.charAt?[b]:b,e=a.charset||c.config.charset;r(this,a);delete this.url;this.urls=b;this.charset=e}function p(a){if(a.$isEntry)return a;var b=a.charset||c.config.charset,e=Ext.manifest,e=e&&e.loader,d=void 0!==a.cache?a.cache:e&&e.cache,f;c.config.disableCaching&&(void 0===d&&(d=!c.config.disableCaching),!1===d?f=+new Date:!0!==d&&(f=d),f&&(e=e&&e.cacheParam||c.config.disableCachingParam,f=e+"\x3d"+
 f));r(this,a);this.charset=b;this.buster=f;this.requests=[]}var l=document,g=[],q={disableCaching:/[?&](?:cache|disableCacheBuster)\b/i.test(location.search)||!/http[s]?\:/i.test(location.href)||/(^|[ ;])ext-cache=1/.test(l.cookie)?!1:!0,disableCachingParam:"_dc",loadDelay:!1,preserveScripts:!0,charset:"UTF-8"},w=/\.css(?:\?|$)/i,u=l.createElement("a"),y="undefined"!==typeof window,v={browser:y,node:!y&&"function"===typeof require,phantom:window&&(window._phantom||window.callPhantom)||/PhantomJS/.test(window.navigator.userAgent)},
 k=Ext.platformTags={},r=function(a,b,e){e&&r(a,e);if(a&&b&&"object"===typeof b)for(var d in b)a[d]=b[d];return a},x=function(){var a=!1,b=Array.prototype.shift.call(arguments),e,d,c,h;"boolean"===typeof arguments[arguments.length-1]&&(a=Array.prototype.pop.call(arguments));c=arguments.length;for(e=0;e<c;e++)if(h=arguments[e],"object"===typeof h)for(d in h)b[a?d.toLowerCase():d]=h[d];return b},t="function"==typeof Object.keys?function(a){return a?Object.keys(a):[]}:function(a){var b=[],e;for(e in a)a.hasOwnProperty(e)&&
@@ -99,10 +98,8 @@ Ext.getResourcePath=function(n,m,p){"string"!==typeof n&&(m=n.pool,p=n.packageNa
 Ext.Microloader=Ext.Microloader||function(){var n=Ext.Boot,m=[],p=!1,l={detectPlatformTags:function(){Ext.beforeLoad&&Ext.beforeLoad(Ext.platformTags)},initPlatformTags:function(){l.detectPlatformTags()},init:function(){l.initPlatformTags();var g=Ext._beforereadyhandler;Ext._beforereadyhandler=function(){Ext.Boot!==n&&(Ext.apply(Ext.Boot,n),Ext.Boot=n);g&&g()}},run:function(){l.init();var g=Ext.manifest;"string"===typeof g?(g=g.indexOf(".json")===g.length-5?g:g+".json",0===location.href.indexOf("file:/")?
 n.load(g+"p"):n.fetch(g,function(g){l.setManifest(JSON.parse(g.content))})):l.load(g)},setManifest:function(g){manifest=Ext.manifest=g;l.load(manifest)},load:function(g){var m=g.loadOrder,w=m?n.createLoadOrderMap(m):null,u=[],y=g.js||[],v=g.css||[],k,r,x,t,c=function(){p=!0;l.notify()};m&&(g.loadOrderMap=w);(function(a,b){x=a.length;for(r=0;r<x;r++)k=a[r],t=!0,k.platform&&!n.filterPlatform(k.platform)&&(t=!1),t&&u.push(k.path);b?n.load({url:u,loadOrder:m,loadOrderMap:w,sequential:!0,success:c,failure:c}):
 n.loadSync({url:u,loadOrder:m,loadOrderMap:w})})(v.concat(y),!0)},onMicroloaderReady:function(g){p?g():m.push(g)},notify:function(){for(var g;g=m.shift();)g()}};return l}();Ext.manifest=Ext.manifest||"bootstrap";Ext.Microloader.run();</script>
-
-                     <script type="text/javascript">
-      
-      document.getElementById('loading-msg').innerHTML = t('Starting...');
-   </script>
+    <script type="text/javascript">
+        document.getElementById('loading-msg').innerHTML = t('Starting...');
+    </script>
 </body>
 </html>

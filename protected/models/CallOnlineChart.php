@@ -19,7 +19,7 @@
  * 19/09/2012
  */
 
-class CallOnlineChart extends CActiveRecord
+class CallOnlineChart extends Model
 {
 	protected $_module = 'callerid';
 	/**

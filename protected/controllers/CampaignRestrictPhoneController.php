@@ -35,6 +35,14 @@ class CampaignRestrictPhoneController extends Controller
 
 	public function actionImportFromCsv()
 	{
+		$module = $this->instanceModel->getModule();
+
+		if(!AccessManager::getInstance($module)->canCreate()||
+		   !AccessManager::getInstance($module)->canUpdate()){
+				header('HTTP/1.0 401 Unauthorized');
+	 			die("Access denied to save in module: $module");
+		}
+
 		$values = $this->getAttributesRequest();
 
 		ini_set("memory_limit", "1500M");

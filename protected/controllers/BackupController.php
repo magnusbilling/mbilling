@@ -60,7 +60,25 @@ class BackupController extends Controller
 			$this->nameSum => array()
 		));
 	}
+	public function actionDownload()
+	{
+		if (Yii::app()->session['isAdmin'] == false)
+			exit;
 
+		$file = $_GET['file'];
+
+		$pathFileCsv = '/usr/local/src/';
+		$path = $pathFileCsv.$file;
+
+		header('Content-type: application/csv');
+		header('Content-Disposition: inline; filename="' . $file . '"');
+		header('Content-Transfer-Encoding: binary');
+		header('Accept-Ranges: bytes');
+		ob_clean();
+		flush();
+		readfile($path);
+
+	}
 	public function scan_dir($dir) {
 	    $ignored = array('.', '..', '.svn', '.htaccess');
 
@@ -106,21 +124,35 @@ class BackupController extends Controller
 
 	}
 
+	public function actionImportFromCsv()
+	{		
+		ini_set("memory_limit", "1024M");
+		ini_set("upload_max_filesize", "100M");
+		ini_set("max_execution_time", "900");
+		if (isset($_FILES['file']['tmp_name'])) {
+
+			$uploadfile = "/usr/local/src/".$_FILES['file']['name'];
+			Yii::log($uploadfile,'info');
+			move_uploaded_file($_FILES["file"]["tmp_name"], $uploadfile);
+		}
+		echo json_encode(array(
+				$this->nameSuccess => true,
+				$this->nameMsg => $this->success
+			));
+		
+	}
+
 	public function actionRecovery()
 	{
 		if (Yii::app()->session['isAdmin'] == false)
 			exit;
 		$name = json_decode($_POST['id']);
 		
-		if (file_exists('/var/www/html/mbilling/tmp/base.sql')) {
-			unlink("/var/www/html/mbilling/tmp/base.sql");
 
-		}		
-		exec("tar xzvf /usr/local/src/".$name);
+		exec("cd /usr/local/src && tar xzvf /usr/local/src/".$name);
 
-		exec("rm -rf /var/www/html/mbilling/etc");
 
-		if (file_exists('/var/www/html/mbilling/tmp/base.sql')) {
+		if (file_exists('/usr/local/src/tmp/base.sql')) {
 
 			$configFile = '/etc/asterisk/res_config_mysql.conf';
 			$array		= parse_ini_file($configFile);
@@ -134,7 +166,7 @@ class BackupController extends Controller
 			$sql = "CREATE database $base";
 			Yii::app()->db->createCommand($sql)->execute();			
 
-			exec("mysql -u $username -p$password $base < /var/www/html/mbilling/tmp/base.sql > /dev/null 2>/dev/null &");
+			exec("mysql -u $username -p$password $base < /usr/local/src/tmp/base.sql > /dev/null 2>/dev/null &");
 
 			echo json_encode(array(
 				$this->nameSuccess => $this->success,

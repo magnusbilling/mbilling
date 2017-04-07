@@ -19,7 +19,7 @@
  * 19/09/2012
  */
 
- class BuyCredit extends CActiveRecord
+ class BuyCredit extends Model
  {
 
  	public static function model($className=__CLASS__)

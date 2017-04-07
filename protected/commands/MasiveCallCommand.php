@@ -73,7 +73,7 @@ class MasiveCallCommand extends CConsoleCommand
 
 			$nbpage = $campaign['frequency'];
 
-			$sql ="SELECT pkg_phonenumber.id as pkg_phonenumber_id, pkg_phonenumber.number, pkg_campaign.id as pkg_campaign_id, pkg_campaign.forward_number,
+			$sql ="SELECT pkg_phonenumber.id as pkg_phonenumber_id, pkg_phonenumber.number, pkg_campaign.id as pkg_campaign_id, pkg_campaign.forward_number,  pkg_campaign.name as pkg_campaign_name,
 			pkg_user.id AS id_user, pkg_user.id_plan, pkg_user.username, pkg_campaign.type, pkg_campaign.description, pkg_phonenumber.name, pkg_phonenumber.city AS number_city, try, restrict_phone , pkg_user.id_user AS id_agent
 			FROM pkg_phonenumber , pkg_phonebook , pkg_campaign_phonebook, pkg_campaign, pkg_user 
 			WHERE pkg_phonenumber.id_phonebook = pkg_phonebook.id AND pkg_campaign_phonebook.id_phonebook = pkg_phonebook.id 
@@ -230,6 +230,7 @@ class MasiveCallCommand extends CConsoleCommand
 				$call = "Action: Originate\n";
 				$call = "Channel: " . $dialstr . "\n";
 				$call .= "Callerid: " . $resultCallerID[0]["callerid"] . "\n";
+				$call .= "Account:  MC!" . $phone["pkg_campaign_name"] . "\n";
 				//$call .= "MaxRetries: 1\n";
 				//$call .= "RetryTime: 100\n";
 				//$call .= "WaitTime: 45\n";

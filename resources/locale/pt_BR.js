@@ -1,4 +1,7 @@
 Locale.load({
+    'UNKNOWN' : 'Desconhecido',
+    'Unmonitored' : 'Não monitorada',
+    'unregistered' : 'Não registrada',
     'Block calls from this expression' : 'Bloquear chamadas desta regra',
     'callsummaryperagent' : 'Cdr por Agente',
     'callsummaryperuser' : 'Cdr por usuário',

@@ -87,7 +87,7 @@ class Controller extends BaseController
 		if($this->getOverrideModel()){
 			$model = explode("/", Yii::app()->controller->id);
 
-			$model = isset($model[1]) ? $model[1] : $model[0].'OR';
+			$model = ucfirst( isset($model[1]) ? $model[1] : $model[0].'OR');
 			Yii::import('application.models.overrides.'.$model);
 			$this->instanceModel = new $model;
 			$this->abstractModel = $model::model($model);
@@ -160,7 +160,7 @@ class Controller extends BaseController
 		$uri = explode("/", Yii::app()->getRequest()->getPathInfo());
 
 		$module_name = preg_match("/overrides/", Yii::app()->getRequest()->getPathInfo()) ? substr($uri[1],0,-2) : $uri[0];
-		return in_array($module_name, $GLOBALS['overrides']['models']); 
+		return in_array(ucfirst($module_name), $GLOBALS['overrides']['models']); 
 	}
 
 	private function paramsToSession()
@@ -189,6 +189,11 @@ class Controller extends BaseController
 	 */
 	public function actionRead()
 	{
+		if(!AccessManager::getInstance($this->instanceModel->getModule())->canRead()){
+				header('HTTP/1.0 401 Unauthorized');
+	 			die("Access denied to read in module:".$this->instanceModel->getModule());
+	 	}
+
 		# recebe os parametros do limit para paginacao
 		$start = isset($_GET[$this->nameParamStart]) ? $_GET[$this->nameParamStart] : -1;
 		$limit = isset($_GET[$this->nameParamLimit]) ? $_GET[$this->nameParamLimit] : -1;
@@ -287,7 +292,16 @@ class Controller extends BaseController
 	public function actionSave()
 	{
 
-		$values = $this->getAttributesRequest();		
+		$values = $this->getAttributesRequest();	
+
+		$module = $this->instanceModel->getModule();
+		
+		if(isset($values['id']) && (!AccessManager::getInstance($module)->canUpdate() && $values['id']!=0 ||
+		   !AccessManager::getInstance($module)->canCreate() && $values['id']==0)){
+				header('HTTP/1.0 401 Unauthorized');
+	 			die("Access denied to save in module: $module");
+	 	}
+
 
 		if ($this->abstractModel->tableName() != 'pkg_campaign') {
 			unset($values['id_phonebook_array'] );
@@ -466,7 +480,7 @@ class Controller extends BaseController
 				$this->success = Yii::app()->db->createCommand($sql)->execute() !== false;
 				$this->msg = $this->msgSuccessLot;
 
-				$info = 'Module ' . preg_replace("/pkg_/", '', $this->abstractModel->tableName() ) . " SET $setters WHERE $namePk IN($strIds)";
+				$info = 'Module ' . preg_replace("/pkg_/", '', $this->abstractModel->tableName() ) . " SET $setters";
 				$info = preg_replace("/'/", "", $info);
 				Util::insertLOG('UPDATE ALL',Yii::app()->session['id_user'],$_SERVER['REMOTE_ADDR'],$info);
 
@@ -566,6 +580,11 @@ class Controller extends BaseController
 
 	public function actionReport()
 	{
+		if(!AccessManager::getInstance($this->instanceModel->getModule())->canRead()){
+				header('HTTP/1.0 401 Unauthorized');
+	 			die("Access denied to read in module:".$this->instanceModel->getModule());
+	 	}
+	 	
 		ini_set("memory_limit", "1024M");
 		if (!isset(Yii::app()->session['id_user'])){
 			$info = 'Uset try export PDF without login';
@@ -626,6 +645,11 @@ class Controller extends BaseController
 
 	public function actionCsv()
 	{
+		if(!AccessManager::getInstance($this->instanceModel->getModule())->canRead()){
+				header('HTTP/1.0 401 Unauthorized');
+	 			die("Access denied to read in module:".$this->instanceModel->getModule());
+	 	}
+
 		if (!isset(Yii::app()->session['id_user'])){
 			$info = 'Uset try export CSV without login';
 			Util::insertLOG('LOGIN',NULL,$_SERVER['REMOTE_ADDR'],$info);
@@ -681,6 +705,12 @@ class Controller extends BaseController
 	 */
 	public function actionDestroy()
 	{
+
+		if(!AccessManager::getInstance($this->instanceModel->getModule())->canDelete()){
+				header('HTTP/1.0 401 Unauthorized');
+	 			die("Access denied to delete in module:".$this->instanceModel->getModule());
+	 	}
+
 		if (!isset(Yii::app()->session['id_user'])){
 			$info = 'Uset try export CSV without login';
 			Util::insertLOG('LOGIN',NULL,$_SERVER['REMOTE_ADDR'],$info);

@@ -14,7 +14,7 @@ class SmsSendController extends BaseController
 
 	public function init()
 	{
-		
+
 		parent::init();
 		if(!isset($_SESSION['language']))
 		{
@@ -196,7 +196,16 @@ class SmsSendController extends BaseController
 				));
 				exit;
 			}
-           	$res = file_get_contents($linkSms);
+			if(!$res = @file_get_contents($linkSms,false)) {
+				echo json_encode(array(
+					$this->nameSuccess => false,
+					'rows' => array(array('id'=>0)),
+					'errors' => "ERROR, contact us"
+					
+				));
+				exit;
+			}
+           	
             	//DESCODIFICA O TESTO DO SMS PARA GRAVAR NO BANCO DE DADOS
             	$text = urldecode($text);
 

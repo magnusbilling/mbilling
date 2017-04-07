@@ -19,7 +19,7 @@
  * 19/09/2012
  */
 
-class UserType extends CActiveRecord
+class UserType extends Model
 {
 	protected $_module = 'usertype';
 	/**

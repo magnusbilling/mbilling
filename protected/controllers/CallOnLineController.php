@@ -123,6 +123,9 @@ class CallOnLineController extends Controller
             $asmanager = new AGI_AsteriskManager;
             $conectaServidor = $conectaServidor = $asmanager->connect($this->host, $this->user, $this->password);
             $server = $asmanager->Command("core show channels concise");
+            if (!isset($server['data'])) {
+                continue;
+            }
             $arr = explode("\n", $server["data"]);
 
 
@@ -241,7 +244,7 @@ class CallOnLineController extends Controller
                             $from_ip = 'IAX';
                         }
 
-                        $reinvite = 'no';
+                        //$reinvite = 'no';
                         //eh uma chamada sip?
                         if (strstr($temp2, 'SIPCALLID')) 
                         {
@@ -262,7 +265,9 @@ class CallOnLineController extends Controller
                                         $reinvite = 'yes';
                                 }
                             }
-                        }
+                        }  
+
+                        $reinvite = isset( $reinvite) ?  $reinvite : 'no';
 
                         
                         if (strstr($temp2, 'USERNAME'))

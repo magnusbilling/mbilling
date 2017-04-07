@@ -131,7 +131,7 @@ class User extends Model
 		
 		if ( $this->getIsNewRecord() ) {
 			
-			if (Yii::app()->getSession()->get( 'is_admin' ) && $groupType[0]->id_user_type == 1) {
+			if (Yii::app()->session['isAdmin'] == true && $groupType[0]->id_user_type == 1) {
 				$this->password = sha1($this->password);
 			}
 			
@@ -184,7 +184,7 @@ class User extends Model
 										,$methodModel[0]->SLAccessToken,false);
 			}	
 
-			$rows = json_decode($_POST['rows']);
+			$rows = array_key_exists('rows', $_POST) ? json_decode($_POST['rows'], true) : $_POST;
 
 			$sql = "SELECT gu.id_user_type as typeActual
 					FROM pkg_user u 
@@ -196,7 +196,7 @@ class User extends Model
 			$groupUserAtualResult = $command->queryAll();
 
 
-			if ( isset($groupUserAtualResult[0]['typeActual']) && $groupUserAtualResult[0]['typeActual'] == 1 && isset($rows->password)) {
+			if ( isset($groupUserAtualResult[0]['typeActual']) && $groupUserAtualResult[0]['typeActual'] == 1 && isset($rows['password'])) {
 				Util::insertLOG('EDIT',Yii::app()->session['id_user'],$_SERVER['REMOTE_ADDR'],'User try change the password');
 
 				echo json_encode(array(
@@ -286,7 +286,7 @@ class User extends Model
 								WHERE id_user= :id AND releasedate = '0000-00-00 00:00:00' 
 								AND status = 1";
 				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(":id_user", $this->id, PDO::PARAM_INT);
+				$command->bindValue(":id", $this->id, PDO::PARAM_INT);
 				$command->execute();
 			}
 

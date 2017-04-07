@@ -39,7 +39,7 @@ class BackupCommand extends CConsoleCommand
 		$base	= $array['dbname'];
 
         $data = date("d-m-Y");
-        $comando = "/usr/bin/mysqldump -u".$username." -p".$password." ".$base." --ignore-table=".$base.".pkg_portabilidade --ignore-table=".$base.".pkg_cdr_archive --ignore-table=".$base.".pkg_cdr_failed > /tmp/base.sql";
+        $comando = "mysqldump -u".$username." -p".$password." ".$base." --ignore-table=".$base.".pkg_portabilidade --ignore-table=".$base.".pkg_cdr_archive --ignore-table=".$base.".pkg_cdr_failed > /tmp/base.sql";
 
         exec($comando);
         $comando = "tar czvf /usr/local/src/backup_voip_Magnus.$data.tgz /tmp/base.sql /etc/asterisk";

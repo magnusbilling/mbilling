@@ -42,7 +42,6 @@ class MagnusCommand extends CConsoleCommand
 		require_once $this->directory.'AGI_Queue.Class.php';
 		require_once $this->directory.'AGI_MassiveCall.Class.php';
 		require_once $this->directory.'AGI_Ivr.Class.php';
-		require_once $this->directory.'AGI_SearchTariff.Class.php';
 
 		$agi = new AGI();		
 
@@ -68,24 +67,31 @@ class MagnusCommand extends CConsoleCommand
 			$MAGNUS->hangup( $agi );
 		}
 
-		/*check if did call*/
-		$mydnid = substr( $MAGNUS->dnid, 0, 1 ) == '0' ? substr( $MAGNUS->dnid, -10 ) : $MAGNUS->dnid;
-
-		$sql = "SELECT pkg_did.id_user AS id_user, pkg_did.id, pkg_did_destination.id AS id_destination, billingtype, id_plan, destination,  voip_call, username, connection_charge, pkg_did.selling_rate_1, pkg_did.selling_rate_2, pkg_did.expression_1, pkg_did.expression_2, did, connection_sell, id_ivr, id_queue, id_sip ".
-			", minimal_time_charge, initblock, increment, block_expression_1, block_expression_2, block_expression_3, expression_3, selling_rate_3 ".
-			"FROM pkg_did_destination ".
-			"INNER JOIN pkg_did ON pkg_did_destination.id_did = pkg_did.id ".
-			"INNER JOIN pkg_user ON pkg_did_destination.id_user = pkg_user.id ".
-			"WHERE pkg_did_destination.activated=1 AND pkg_did.activated=1 ".
-			"and did LIKE '%$mydnid' ".
-			"ORDER BY priority ASC ";
-		$result_did = Yii::app()->db->createCommand( $sql )->queryAll();
-		$agi->verbose( $sql, 25 );
 		$mode = 'standard';
 		$Calc = new Calc();
 
-		$sql = "SELECT * FROM pkg_sip WHERE name = '$mydnid'";
-		$resultIsSip = Yii::app()->db->createCommand( $sql )->queryAll();
+
+		if (strlen($mydnid) < 5){
+			/*check if did call*/
+			$mydnid = substr( $MAGNUS->dnid, 0, 1 ) == '0' ? substr( $MAGNUS->dnid, -10 ) : $MAGNUS->dnid;
+
+			$sql = "SELECT pkg_did.id_user AS id_user, pkg_did.id, pkg_did_destination.id AS id_destination, billingtype, id_plan, destination,  voip_call, username, connection_charge, pkg_did.selling_rate_1, pkg_did.selling_rate_2, pkg_did.expression_1, pkg_did.expression_2, did, connection_sell, id_ivr, id_queue, id_sip ".
+				", minimal_time_charge, initblock, increment, block_expression_1, block_expression_2, block_expression_3, expression_3, selling_rate_3 ".
+				"FROM pkg_did_destination ".
+				"INNER JOIN pkg_did ON pkg_did_destination.id_did = pkg_did.id ".
+				"INNER JOIN pkg_user ON pkg_did_destination.id_user = pkg_user.id ".
+				"WHERE pkg_did_destination.activated=1 AND pkg_did.activated=1 ".
+				"and did LIKE '%$mydnid' ".
+				"ORDER BY priority ASC ";
+			$result_did = Yii::app()->db->createCommand( $sql )->queryAll();
+			$agi->verbose( $sql, 25 );
+		}
+		
+		//only check if is a internal call if the caller is a Mbilling user
+		if (strlen($MAGNUS->accountcode) > 0) {
+			$sql = "SELECT * FROM pkg_sip WHERE name = '$mydnid'";
+			$resultIsSip = Yii::app()->db->createCommand( $sql )->queryAll();
+		}
 
 		if ( count( $result_did ) > 0 && count( $resultIsSip ) < 1) {
 
@@ -430,7 +436,11 @@ class MagnusCommand extends CConsoleCommand
 			if ( $cia_res == 0 ) {
 				$MAGNUS->agiconfig['use_dnid'] = 1;
 
-				$resfindrate = AGI_SearchTariff::find( $MAGNUS, $agi, $Calc );
+				$SearchTariff = new SearchTariff();
+ 				$resfindrate = $SearchTariff->find($MAGNUS->destination, $MAGNUS->id_plan, $MAGNUS->id_user, $agi);
+	          	$Calc->tariffObj = $resfindrate;
+   				$Calc->number_trunk = count( $resfindrate );
+	
 				$agi->verbose( print_r( $Calc->tariffObj, true ), 10 );
 				$Calc->usedratecard = 0;
 				/* IF FIND RATE*/

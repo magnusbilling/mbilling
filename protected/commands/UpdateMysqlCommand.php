@@ -632,7 +632,43 @@ dbpass = '.$password.'
 			$version = '5.3.1';
 			$sql = "UPDATE pkg_configuration SET config_value = '".$version."' WHERE config_key = 'version' ";
 			Yii::app()->db->createCommand( $sql )->execute();
-		}		
+		}
+
+		if ( $version == '5.3.1' ) {
+
+			$sql = "ALTER TABLE  `pkg_prefix` CHANGE  `prefix`  `prefix` VARCHAR( 18 ) NOT NULL;";
+			try {
+				Yii::app()->db->createCommand( $sql )->execute();
+			} catch ( Exception $e ) {
+
+			}
+
+			$version = '5.3.2';
+			$sql = "UPDATE pkg_configuration SET config_value = '".$version."' WHERE config_key = 'version' ";
+			Yii::app()->db->createCommand( $sql )->execute();
+		}
+
+		if ( $version == '5.3.2' ) {
+
+			$sql = "ALTER TABLE  `pkg_rate_callshop` ADD  `minimal_time_charge` INT( 11 ) DEFAULT  '0'";
+			try {
+				Yii::app()->db->createCommand( $sql )->execute();
+			} catch ( Exception $e ) {
+
+			}
+
+			$sql = "INSERT INTO pkg_configuration VALUES (NULL, 'Social Media Network to show in customer panel', 'social_media_network', '', 'Social Media Network to show in customer panel', 'global', '1');";
+			try {
+				Yii::app()->db->createCommand( $sql )->execute();
+			} catch ( Exception $e ) {
+
+			}
+			
+
+			$version = '5.3.3';
+			$sql = "UPDATE pkg_configuration SET config_value = '".$version."' WHERE config_key = 'version' ";
+			Yii::app()->db->createCommand( $sql )->execute();
+		}
 
 	}	
 }
