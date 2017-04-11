@@ -64,6 +64,8 @@ class BackupController extends Controller
 	{
 		if (Yii::app()->session['isAdmin'] == false)
 			exit;
+		if (!Yii::app()->session['id_user'])
+            exit;
 
 		$file = $_GET['file'];
 
@@ -80,24 +82,30 @@ class BackupController extends Controller
 
 	}
 	public function scan_dir($dir) {
-	    $ignored = array('.', '..', '.svn', '.htaccess');
+		if (Yii::app()->session['isAdmin'] == false)
+			exit;
+		if (!Yii::app()->session['id_user'])
+            exit;
+	    	$ignored = array('.', '..', '.svn', '.htaccess');
 
-	    $files = array();    
-	    foreach (scandir($dir) as $file) {
-	        if (in_array($file, $ignored)) continue;
-	        $files[$file] = filemtime($dir . '/' . $file);
-	    }
+	    	$files = array();    
+	    	foreach (scandir($dir) as $file) {
+	        	if (in_array($file, $ignored)) continue;
+	       	$files[$file] = filemtime($dir . '/' . $file);
+	    	}
 
-	    arsort($files);
-	    $files = array_keys($files);
+	    	arsort($files);
+	   	$files = array_keys($files);
 
-	    return ($files) ? $files : false;
+	    	return ($files) ? $files : false;
 	}
 
 	public function actionDestroy()
 	{
 		if (Yii::app()->session['isAdmin'] == false)
 			exit;
+		if (!Yii::app()->session['id_user'])
+            exit;
 		$ids = json_decode($_POST['ids']);
 		foreach ($ids as $key => $value) {
 			unlink($this->diretory.$value);
@@ -114,6 +122,8 @@ class BackupController extends Controller
 	{
 		if (Yii::app()->session['isAdmin'] == false)
 			exit;
+		if (!Yii::app()->session['id_user'])
+            exit;
 		exec("php /var/www/html/mbilling/cron.php Backup");
 
 		echo json_encode(array(
@@ -125,7 +135,11 @@ class BackupController extends Controller
 	}
 
 	public function actionImportFromCsv()
-	{		
+	{	
+		if (Yii::app()->session['isAdmin'] == false)
+			exit;
+		if (!Yii::app()->session['id_user'])
+            exit;	
 		ini_set("memory_limit", "1024M");
 		ini_set("upload_max_filesize", "100M");
 		ini_set("max_execution_time", "900");
@@ -146,6 +160,8 @@ class BackupController extends Controller
 	{
 		if (Yii::app()->session['isAdmin'] == false)
 			exit;
+		if (!Yii::app()->session['id_user'])
+            	exit;
 		$name = json_decode($_POST['id']);
 		
 
