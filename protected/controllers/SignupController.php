@@ -45,8 +45,23 @@ class SignupController extends BaseController
 
 			$signup->id_group = $result[0]['id'];
 			$signup->active = $_POST['Signup']['id_user'] > 1 ? 1 : 2;
-			$signup->prefix_local = '0/55,*/5511/8,*/5511/9';
-			
+
+
+			if ($config['global']['base_language'] == 'pt_BR') {
+				$phone = $_POST['Signup']['phone'];
+				if (substr($phone, 0,2) == 55 && strlen($phone) > 11)
+					$ddd = substr($phone, 2,2);					
+				elseif(substr($phone, 0,1) == 0)
+					$ddd = substr($phone, 1,2);
+				elseif(strlen($phone) == 10 || (strlen($phone) == 11 && substr($phone, 2,1) == 9))
+					$ddd = substr($phone,0,2);
+				else
+					$ddd = 11;				
+				$signup->prefix_local = '0/55,*/55'.$ddd.'/8,*/55'.$ddd.'/9';
+			}else{
+				$signup->prefix_local = '';
+			}
+		
 			$signup->username = Util::getNewUsername();
 			$signup->callingcard_pin = Util::getNewLock_pin();
 			$signup->loginkey = trim(Util::gerarSenha(20, true, true, true, false));
@@ -58,21 +73,19 @@ class SignupController extends BaseController
 
 			$signup->attributes=$_POST['Signup'];
 
-			$sucess = $signup->save();	
-
+			$sucess = $signup->save();
 		
 
 			if($sucess){
-				$fields = "id_user, accountcode, name, allow, host, insecure, defaultuser, secret";
-				$values = " :id_user, :username, :username, 'g729,gsm', 'dynamic', 'no', :username, :password";
+				$fields = "id_user, accountcode, name, allow, host, insecure, defaultuser, secret, callerid,cid_number";
+				$values = " :id_user, :username, :username, 'g729,gsm', 'dynamic', 'no', :username, :password, :callerid, :callerid";
 				$sql = "INSERT INTO pkg_sip ($fields) VALUES ($values)";
 				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(":id_user", $signup->id, PDO::PARAM_STR);
+				$command->bindValue(":id_user", $signup->id, PDO::PARAM_INT);
 				$command->bindValue(":username", $signup->username, PDO::PARAM_STR);
 				$command->bindValue(":password", $password, PDO::PARAM_STR);
-				$sucess = $command->execute();
-
-				
+				$command->bindValue(":callerid", $signup->phone, PDO::PARAM_STR);
+				$sucess = $command->execute();				
 				$this->redirect(array('view','id'=>$signup->id, 'username' => $signup->username, 'password' => $signup->password, 'id_user' => $_POST['Signup']['id_user']));
 			}
 				
