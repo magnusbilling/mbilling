@@ -65,7 +65,7 @@ class SearchTariff {
             "LEFT JOIN pkg_trunk AS pkg_trunk ON pkg_trunk.id = pkg_rate.id_trunk " .
             "LEFT JOIN pkg_prefix ON pkg_rate.id_prefix = pkg_prefix.id " .
             "LEFT JOIN pkg_provider ON pkg_trunk.id_provider = pkg_provider.id " .
-            "WHERE pkg_plan.id=$id_plan AND pkg_rate.status = 1 AND $prefixclause " .
+            "WHERE pkg_plan.id=$id_plan AND pkg_rate.status = 1 AND ($prefixclause) " .
             "ORDER BY pkg_prefix.prefix DESC";
         $agi->verbose( $sql, 25 );
         $result = Yii::app()->db->createCommand( $sql )->queryAll();
