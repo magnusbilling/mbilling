@@ -46,7 +46,7 @@
 		return array(
 			array('password,lastname, firstname, email, city, state, phone, id_plan, id_user', 'required'),
 			array('phone, zipcode, vat, mobile', 'numerical'),
-			array('password, password2', 'length', 'min'=>8),
+			array('password, password2', 'length', 'min'=>6),
 			array('lastname,zipcode, firstname, city, country', 'length', 'min'=>4),
 			array('state', 'length', 'min'=>2),
 			array('doc', 'length', 'min'=>11),
