@@ -55,6 +55,11 @@ class BoletoController extends Controller
 		move_uploaded_file($_FILES["file"]["tmp_name"], $uploadfile);
 
 
+		$boletosOk = "-->Boletos processados <-- </br>";
+		$boletosNo = "Total de Boletos não processadors -->  ";
+		$boletosNoTotal = 0;
+
+
 		if ($banco == 'cef') {
 			require_once("lib/boletophp/retorno/RetornoBanco.php");
 			require_once("lib/boletophp/retorno/RetornoFactory.php");
@@ -66,11 +71,7 @@ class BoletoController extends Controller
 
 			$retorno = new RetornoBanco($cnab240);
 
-			$nossoNumero = $retorno->processar();
-
-			$boletosOk = "-->Boletos processados <-- </br>";
-			$boletosNo = "Total de Boletos não processadors -->  ";
-			$boletosNoTotal = 0;
+			$nossoNumero = $retorno->processar();		
 		
 
 			foreach ($nossoNumero as $key => $value) {
@@ -92,9 +93,10 @@ class BoletoController extends Controller
 						$amount = $resultBoleto[0]['payment'];
 						$description = 'Boleto número , '.$nosso_numero ;
 
-						Process ::releaseUserCredit($resultBoleto[0]['id_user'], $amount, $description, $nosso_numero);
+						Process ::releaseUserCredit($resultBoleto[0]['id_user'], $amount, $description);
 
-
+						ServicesProcess::checkIfServiceToPayAfterRefill($resultBoleto[0]['id_user']);
+						
 						$sql = "UPDATE  pkg_boleto  SET status = 1 WHERE id = :nosso_numero";
 						$command = Yii::app()->db->createCommand($sql);
 						$command->bindValue(":nosso_numero", $nosso_numero, PDO::PARAM_STR);
@@ -111,9 +113,78 @@ class BoletoController extends Controller
 
 
 				}
-			}
+			}			
 
-			if (strlen($boletosOk) < 32) {
+		}else if ($banco == 'bradesco') {
+			$arquivo = fopen ($uploadfile,'r');
+
+			
+
+			$i = 0;
+			while (!feof($arquivo)) {
+				$linha = fgets($arquivo,1024);
+				
+				if ($i == 0) {
+
+					if (!preg_match("/BRADESCO/", $linha)) {
+						echo json_encode(array(
+							$this->nameSuccess => false,
+							$this->nameMsg => 'Este arquivo não é do bradesco'
+						));
+						exit;
+					}
+					$i++;
+					continue;
+				}else{
+					$i++;
+
+
+					$valortitulo = ltrim(substr($linha, 152, 13),0);
+					$valorPago = ltrim(substr($linha, 253, 13),0);
+					$nosso_numero = ltrim(substr($linha, 70, 11),0);
+				
+					if (strlen($valortitulo) < 1 || strlen($valorPago) < 1 || $valorPago == 0) {
+						continue;
+					}
+					Yii::log($nosso_numero,'info');
+					$sql = "SELECT id, id_user, status, payment   FROM pkg_boleto WHERE id = :nosso_numero";
+					$command = Yii::app()->db->createCommand($sql);
+					$command->bindValue(":nosso_numero", $nosso_numero, PDO::PARAM_STR);
+					$resultBoleto = $command->queryAll();
+		
+					if (count($resultBoleto) > 0) {
+
+
+						if ($resultBoleto[0]['status'] == 0) {
+
+							$amount = $resultBoleto[0]['payment'];
+							$description = 'Boleto número , '.$nosso_numero ;
+
+							Process::releaseUserCredit($resultBoleto[0]['id_user'], $amount, $description);
+							ServicesProcess::checkIfServiceToPayAfterRefill($resultBoleto[0]['id_user']);
+
+							$sql = "UPDATE  pkg_boleto  SET status = 1 WHERE id = :nosso_numero";
+							$command = Yii::app()->db->createCommand($sql);
+							$command->bindValue(":nosso_numero", $nosso_numero, PDO::PARAM_STR);
+							$command->execute();
+
+							$boletosOk .= $nosso_numero ."</br>";
+						}else{
+							$boletosNoTotal++;
+						}							
+						
+					}
+					else{
+						$boletosNoTotal++;
+					}				
+					
+				}	
+
+			}
+		}
+
+
+		if (strlen($boletosOk) < 32) {
 				$boletosOk .= "Nenhun boleto dado de baixa</br>";
 			}
 
@@ -126,8 +197,6 @@ class BoletoController extends Controller
 				$this->nameMsg => $boletosOk."</br>".$boletosNo . ' '. $boletosNoTotal
 			));
 			exit;
-
-		}
 
 	
 	}

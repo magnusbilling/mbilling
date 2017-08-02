@@ -1,3 +1,6 @@
+form { 
+    margin: 0 auto; 
+}
 .styled-select {
    width: 240px;
    height: 34px;
@@ -45,7 +48,7 @@ label {
     font-weight: bold;
     margin-right:10px;
     text-align: right;
-    width: 150px;
+    width: 230px;
     line-height: 25px;
     font-size: 15px;
 }
@@ -55,7 +58,7 @@ label {
     font-size: 15px;
     padding: 5px;
     border: 1px solid #b9bdc1;
-    width: 300px;
+    width: 380px;
     color: #797979;
 }
 .hint{

@@ -69,12 +69,17 @@ class MasiveCallCommand extends CConsoleCommand
 
 		foreach ($campaignResult as $campaign) {
 
-			if(DEBUG >= 1) echo  "SEARCH NUMBER IN CAMPAIGN ". $campaign['name'] ."\n";
+
+			
+
+
+
+			if(DEBUG >= 1) echo  "SEARCH NUMBER IN CAMPAIGN ". $campaign['name'] ."\n";	
 
 			$nbpage = $campaign['frequency'];
 
 			$sql ="SELECT pkg_phonenumber.id as pkg_phonenumber_id, pkg_phonenumber.number, pkg_campaign.id as pkg_campaign_id, pkg_campaign.forward_number,  pkg_campaign.name as pkg_campaign_name,
-			pkg_user.id AS id_user, pkg_user.id_plan, pkg_user.username, pkg_campaign.type, pkg_campaign.description, pkg_phonenumber.name, pkg_phonenumber.city AS number_city, try, restrict_phone , pkg_user.id_user AS id_agent
+			pkg_user.id AS id_user, pkg_user.id_plan, pkg_campaign.id_plan AS campaign_id_plan, pkg_user.username, pkg_campaign.type, pkg_campaign.description, pkg_phonenumber.name, pkg_phonenumber.city AS number_city, try, restrict_phone , pkg_user.id_user AS id_agent
 			FROM pkg_phonenumber , pkg_phonebook , pkg_campaign_phonebook, pkg_campaign, pkg_user 
 			WHERE pkg_phonenumber.id_phonebook = pkg_phonebook.id AND pkg_campaign_phonebook.id_phonebook = pkg_phonebook.id 
 			AND pkg_campaign_phonebook.id_campaign = pkg_campaign.id AND pkg_campaign.id_user = pkg_user.id AND pkg_campaign.status = 1 
@@ -90,17 +95,34 @@ class MasiveCallCommand extends CConsoleCommand
 			
 
 
+
 			if (count($callResult) == 0)
 			{
 				if(DEBUG >= 1) echo  "NO PHONE FOR CALL"."\n\n\n";
 				continue;
 			}
 
+			if ($campaign['frequency'] <= 60) {
+				//se for menos de 60 por minutos divido 60 pela frequncia e depois somo o resultado para mandar 1 chamada a cada segundos resultante da divisao.
+				$sleep = 60 / $campaign['frequency'];
 			
-
-	
+			}else{
+				//divido a frequencia por 60 e depois mando o resultado em cada segundo.
+				$sleep = $campaign['frequency'] / 60;
+			}
+			
+			$i == 0;
+			$ids = '';
+			$sleepNext = 1;
 			foreach ($callResult as $phone) 
 			{
+				$i++;		
+
+
+
+				if ($phone['campaign_id_plan'] > 0) 
+					$phone['id_plan'] = $phone['campaign_id_plan'];				
+
 
 				if($phone['id_agent'] > 1){
 					$id_plan_agent  = $phone['id_plan'];
@@ -223,7 +245,8 @@ class MasiveCallCommand extends CConsoleCommand
 
 				$sql = "SELECT callerid FROM pkg_sip WHERE id_user =".$phone["id_user"];
 				$resultCallerID    = Yii::app()->db->createCommand($sql)->queryAll();
-		
+			
+
 				$dialstr = "$providertech/$trunkcode/$destination";
 
 				// gerar os arquivos .call
@@ -253,18 +276,31 @@ class MasiveCallCommand extends CConsoleCommand
 				$arquivo_call = "/tmp/$aleatorio.call";
 				$fp = fopen("$arquivo_call", "a+");
 				fwrite($fp, $call);
-				fclose($fp);
+				fclose($fp);				
 
-				touch("$arquivo_call", mktime(date("H"), date("i"), date("s") + 1, date("m"), date("d"), date("Y")));
+			
+				touch("$arquivo_call", mktime(date("H"), date("i"), date("s") + $sleepNext, date("m"), date("d"), date("Y")));
 				chown("$arquivo_call", "asterisk");
 				chgrp("$arquivo_call", "asterisk");
 				chmod("$arquivo_call", 0755);
 				exec("mv $arquivo_call /var/spool/asterisk/outgoing/$aleatorio.call");
+				
 
-				$sql = "UPDATE pkg_phonenumber SET  status = 2, try = try + 1 WHERE id = ".$phone['pkg_phonenumber_id'];
-				Yii::app()->db->createCommand($sql)->execute();	
+				if ($campaign['frequency'] <= 60) {
+					$sleepNext += $sleep;
+				}else{
+					//a cada multiplo do resultado, passo para o proximo segundo
+					if (($i % $sleep) == 0)
+						$sleepNext += 1;
+				}
+
+				
+				$ids.= $phone['pkg_phonenumber_id'].',';
 							
 			}
+			$sql = "UPDATE pkg_phonenumber SET  status = 2, try = try + 1 WHERE id IN (".substr($ids, 0,-1).")";
+			Yii::app()->db->createCommand($sql)->execute();	
+			echo "Campain ".$campaign['name'] ." sent ".$i." calls \n\n";
 		}				
 	}	
 }

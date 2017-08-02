@@ -75,8 +75,8 @@ class MagnusCommand extends CConsoleCommand
 			/*check if did call*/
 			$mydnid = substr( $MAGNUS->dnid, 0, 1 ) == '0' ? substr( $MAGNUS->dnid, -10 ) : $MAGNUS->dnid;
 
-			$sql = "SELECT pkg_did.id_user AS id_user, pkg_did.id, pkg_did_destination.id AS id_destination, billingtype, id_plan, destination,  voip_call, username, connection_charge, pkg_did.selling_rate_1, pkg_did.selling_rate_2, pkg_did.expression_1, pkg_did.expression_2, did, connection_sell, id_ivr, id_queue, id_sip ".
-				", minimal_time_charge, initblock, increment, block_expression_1, block_expression_2, block_expression_3, expression_3, selling_rate_3 ".
+			$sql = "SELECT pkg_did.id_user AS id_user, pkg_did.id, pkg_did_destination.id AS id_destination, billingtype, id_plan, destination,  voip_call, username, connection_charge, pkg_did.selling_rate_1, pkg_did.selling_rate_2, pkg_did.expression_1, pkg_did.expression_2, did, connection_sell,cbr_em, id_ivr, id_queue, id_sip, cbr ".
+				", minimal_time_charge, initblock, increment, block_expression_1, block_expression_2, block_expression_3, expression_3, selling_rate_3, workaudio, noworkaudio, send_to_callback_1,send_to_callback_2,send_to_callback_3,cbr_ua,TimeOfDay_monFri,TimeOfDay_sat, TimeOfDay_sun ".
 				"FROM pkg_did_destination ".
 				"INNER JOIN pkg_did ON pkg_did_destination.id_did = pkg_did.id ".
 				"INNER JOIN pkg_user ON pkg_did_destination.id_user = pkg_user.id ".
@@ -95,30 +95,51 @@ class MagnusCommand extends CConsoleCommand
 
 		if ( count( $result_did ) > 0 && count( $resultIsSip ) < 1) {
 
-			if ($result_did[0]['block_expression_1'] == 1) {
+			if ($result_did[0]['block_expression_1'] == 1 || $result_did[0]['send_to_callback_1']) {
 				$agi->verbose("try blocked number match with expression 1, ". $MAGNUS->CallerID. ' '.$result_did[0]['expression_2'],1); 					
 				if ( strlen($result_did[0]['expression_1']) > 1 && ereg($result_did[0]['expression_1'], $MAGNUS->CallerID) ) {
-            			$agi->verbose("Call blocked becouse this number becouse match with expression 1, ". $MAGNUS->CallerID. ' FROM did '.$result_did[0]['did'],1);     
-        				$MAGNUS->hangup( $agi );
+            			
+
+            			if ($result_did[0]['block_expression_1'] == 1 ){
+            				$agi->verbose("Call blocked becouse this number becouse match with expression 1, ". $MAGNUS->CallerID. ' FROM did '.$result_did[0]['did'],1);
+            				$MAGNUS->hangup( $agi );
+            			}        					
+        				elseif($result_did[0]['send_to_callback_1'] == 1){
+        					$agi->verbose('Send to Callback expression 1',10);
+        					$result_did[0]['voip_call'] = 6;
+        				}
 	        		}
 	        	}    	
 
-	        	if ($result_did[0]['block_expression_2'] == 1) {
+	        	if ($result_did[0]['block_expression_2'] == 1 || $result_did[0]['send_to_callback_2']) {
 	        		$agi->verbose("try blocked number match with expression 2, ". $MAGNUS->CallerID. ' '.$result_did[0]['expression_2'],1); 
-					if ( strlen($result_did[0]['expression_2']) > 1 && ereg($result_did[0]['expression_2'], $MAGNUS->CallerID)) {
-		            		$agi->verbose("Call blocked becouse this number becouse match with expression 2, ". $MAGNUS->CallerID. ' FROM did '.$result_did[0]['did'],1); 
-		            		$MAGNUS->hangup( $agi );
-		        		}
+				if ( strlen($result_did[0]['expression_2']) > 1 && ereg($result_did[0]['expression_2'], $MAGNUS->CallerID)) {
+	            		if ($result_did[0]['block_expression_2'] == 1 ){
+            				$agi->verbose("Call blocked becouse this number becouse match with expression 2, ". $MAGNUS->CallerID. ' FROM did '.$result_did[0]['did'],1);
+            				$MAGNUS->hangup( $agi );
+            			} 
+        				elseif($result_did[0]['send_to_callback_2'] == 1){
+        					$agi->verbose('Send to Callback expression 2',10);
+        					$result_did[0]['voip_call'] = 6;
+        				}
+	        		}
 	        	}
 
-	        	if ($result_did[0]['block_expression_3'] == 1) {        		
+	        	if ($result_did[0]['block_expression_3'] == 1 || $result_did[0]['send_to_callback_3']) {        		
 	        		$agi->verbose("try blocked number match with expression 3, ". $MAGNUS->CallerID. ' '.$result_did[0]['expression_3'],1); 
 				if (  	strlen($result_did[0]['expression_3']) > 0 && (ereg($result_did[0]['expression_3'], $MAGNUS->CallerID) || $result_did[0]['expression_3'] == '*') &&  
 						strlen($result_did[0]['expression_1']) > 1 && !ereg($result_did[0]['expression_1'], $MAGNUS->CallerID) &&
 						strlen($result_did[0]['expression_2']) > 1 && !ereg($result_did[0]['expression_2'], $MAGNUS->CallerID)
 					) {
-	            		$agi->verbose("Call blocked becouse this number becouse match with expression 3, ". $MAGNUS->CallerID. ' FROM did '.$result_did[0]['did'],1); 
-	            		$MAGNUS->hangup( $agi );
+	        
+	            		if ($result_did[0]['block_expression_1'] == 3 ){
+            				$agi->verbose("Call blocked becouse this number becouse match with expression 3, ". $MAGNUS->CallerID. ' FROM did '.$result_did[0]['did'],1);
+            				$MAGNUS->hangup( $agi );
+            			} 
+        				elseif($result_did[0]['send_to_callback_3'] == 1){
+        					$agi->verbose('Send to Callback expression 3',10);
+        					$result_did[0]['voip_call'] = 6;
+        				}
 	        		}
         		}
 
@@ -341,11 +362,51 @@ class MagnusCommand extends CConsoleCommand
 
 			}
 		}
-		elseif ( $mode == 'queue' ) {
-			$agi->answer();
+		elseif ( $mode == 'queue' ) {			
 
 			$Calc->init();
 			$MAGNUS->init();
+			if ($result_did[0]['cbr'] == 1) {
+				$sql = "SELECT * FROM pkg_user WHERE id = ".$result_did[0]['id_user'];
+				$result_user = Yii::app()->db->createCommand( $sql )->queryAll();
+				$MAGNUS->CallerID = preg_replace("/\+/", '', $MAGNUS->CallerID);
+				$CallerID = $MAGNUS->number_translation($agi,$result_user[0]['prefix_local'],$MAGNUS->CallerID);
+				//adiciona o 55 se o callerid tiver somente com DDD numero
+				if (strtoupper($MAGNUS->config['global']['base_country'])  == 'BRL' || strtoupper($MAGNUS->config['global']['base_country'])  == 'ARG'
+						&& (strlen($CallerID) == 10 ||  strlen($CallerID) == 11) ){
+					$CallerID = "55".$CallerID;
+				}
+
+				$fields = 'id_did, exten, id_user, status';
+				$values = $result_did[0]['id']." , '$CallerID', '".$result_did[0]['id_user']."', 1";
+				$sql = "INSERT INTO pkg_callback ($fields) VALUES ($values)";
+				$agi->verbose($sql,25);
+				Yii::app()->db->createCommand( $sql )->execute();
+				//audio enable
+				if ($result_did[0]['cbr_ua'] == 1) {
+
+					$work = $MAGNUS->checkIVRSchedule($result_did);
+					//esta dentro do hario de atencao
+					$audioURA = $work == 'open' ? 'idDidAudioProWork_' : 'idDidAudioProNoWork_';					
+					$audio = "/var/www/html/mbilling/resources/sounds/".$audioURA.$result_did[0]['id'];
+					//early_media enable
+					if ($result_did[0]['cbr_em'] == 1) {
+						$agi->verbose('earl ok');
+						$agi->execute('Ringing');
+						$agi->execute("Progress");
+						$agi->execute('Wait','1');					
+						$agi->execute('Playback',"$audio,noanswer");					
+					}else{
+						$agi->answer();
+						$agi->execute('Wait','1');
+						$agi->stream_file($audio, '#');
+					}
+				}
+				$agi->execute('Congestion','5');
+				$MAGNUS->hangup($agi); 
+			}
+
+			$agi->answer();
 			if ( strlen( $mydnid ) > 0 ) {
 				$agi->verbose( "DID QUEUE - CallerID=" . $MAGNUS->CallerID . " -> DID=" . $mydnid, 6 );
 				//$MAGNUS->CallIvr($agi, $Calc, $result_did);

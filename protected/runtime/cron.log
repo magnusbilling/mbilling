@@ -1,0 +1,276 @@
+2017/03/23 17:03:10 [error] [system.db.CDbCommand] CDbCommand::fetchAll() failed: SQLSTATE[HY000]: General error: 2006 MySQL server has gone away. The SQL statement executed was: SELECT lcrtype, pkg_plan.id AS id_plan, pkg_prefix.prefix AS dialprefix, pkg_plan.name, pkg_rate.id_prefix, pkg_rate.id AS id_rate, buyrate,  buyrateinitblock buyrateinitblock, buyrateincrement, rateinitial, initblock, billingblock, connectcharge, disconnectcharge disconnectcharge,pkg_rate.id_trunk AS id_trunk, pkg_trunk.trunkprefix AS rc_trunkprefix, pkg_trunk.directmedia AS rc_directmedia,pkg_trunk.providertech AS rc_providertech ,pkg_trunk.providerip AS rc_providerip, pkg_trunk.removeprefix AS rc_removeprefix, pkg_trunk.failover_trunk AS rt_failover_trunk, pkg_trunk.addparameter AS rt_addparameter_trunk,  pkg_trunk.status, pkg_trunk.inuse, pkg_trunk.maxuse, pkg_trunk.allow_error,  pkg_trunk.if_max_use, pkg_rate.additional_grace AS additional_grace, minimal_time_charge, minimal_time_buy, pkg_trunk.link_sms, pkg_trunk.user user, pkg_trunk.secret, package_offer , pkg_trunk.id_provider, pkg_provider.credit_control, pkg_provider.credit FROM pkg_plan LEFT JOIN pkg_rate ON pkg_plan.id = pkg_rate.id_plan LEFT JOIN pkg_trunk AS pkg_trunk ON pkg_trunk.id = pkg_rate.id_trunk LEFT JOIN pkg_prefix ON pkg_rate.id_prefix = pkg_prefix.id LEFT JOIN pkg_provider ON pkg_trunk.id_provider = pkg_provider.id WHERE pkg_plan.id=1 AND pkg_rate.status = 1 AND (prefix='555191177' OR prefix='55519117' OR prefix='5551911' OR prefix='555191' OR prefix='55519' OR prefix='5551' OR prefix='555' OR prefix='55' OR prefix='5' ) OR (prefix LIKE '&_%' ESCAPE '&' AND '555191177964'
+                    REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', prefix, '$'), 
+                    'X', '[0-9]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', '')) ORDER BY pkg_prefix.prefix DESC.
+in /Library/WebServer/Documents/MBilling_5/protected/components/SearchTariff.php (71)
+in /Library/WebServer/Documents/MBilling_5/protected/commands/AGI_Magnus.Class.php (347)
+in /Library/WebServer/Documents/MBilling_5/protected/commands/MagnusCommand.php (280)
+2017/03/23 17:03:10 [error] [exception.CDbException] exception 'CDbException' with message 'CDbCommand failed to execute the SQL statement: SQLSTATE[HY000]: General error: 2006 MySQL server has gone away. The SQL statement executed was: SELECT lcrtype, pkg_plan.id AS id_plan, pkg_prefix.prefix AS dialprefix, pkg_plan.name, pkg_rate.id_prefix, pkg_rate.id AS id_rate, buyrate,  buyrateinitblock buyrateinitblock, buyrateincrement, rateinitial, initblock, billingblock, connectcharge, disconnectcharge disconnectcharge,pkg_rate.id_trunk AS id_trunk, pkg_trunk.trunkprefix AS rc_trunkprefix, pkg_trunk.directmedia AS rc_directmedia,pkg_trunk.providertech AS rc_providertech ,pkg_trunk.providerip AS rc_providerip, pkg_trunk.removeprefix AS rc_removeprefix, pkg_trunk.failover_trunk AS rt_failover_trunk, pkg_trunk.addparameter AS rt_addparameter_trunk,  pkg_trunk.status, pkg_trunk.inuse, pkg_trunk.maxuse, pkg_trunk.allow_error,  pkg_trunk.if_max_use, pkg_rate.additional_grace AS additional_grace, minimal_time_charge, minimal_time_buy, pkg_trunk.link_sms, pkg_trunk.user user, pkg_trunk.secret, package_offer , pkg_trunk.id_provider, pkg_provider.credit_control, pkg_provider.credit FROM pkg_plan LEFT JOIN pkg_rate ON pkg_plan.id = pkg_rate.id_plan LEFT JOIN pkg_trunk AS pkg_trunk ON pkg_trunk.id = pkg_rate.id_trunk LEFT JOIN pkg_prefix ON pkg_rate.id_prefix = pkg_prefix.id LEFT JOIN pkg_provider ON pkg_trunk.id_provider = pkg_provider.id WHERE pkg_plan.id=1 AND pkg_rate.status = 1 AND (prefix='555191177' OR prefix='55519117' OR prefix='5551911' OR prefix='555191' OR prefix='55519' OR prefix='5551' OR prefix='555' OR prefix='55' OR prefix='5' ) OR (prefix LIKE '&_%' ESCAPE '&' AND '555191177964'
+                    REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', prefix, '$'), 
+                    'X', '[0-9]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', '')) ORDER BY pkg_prefix.prefix DESC' in /Library/WebServer/Documents/MBilling_5/yii/framework/db/CDbCommand.php:541
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/db/CDbCommand.php(395): CDbCommand->queryInternal('fetchAll', Array, Array)
+#1 /Library/WebServer/Documents/MBilling_5/protected/components/SearchTariff.php(71): CDbCommand->queryAll()
+#2 /Library/WebServer/Documents/MBilling_5/protected/commands/AGI_Magnus.Class.php(347): SearchTariff->find('555191177964', '1', '110', Object(AGI))
+#3 /Library/WebServer/Documents/MBilling_5/protected/commands/MagnusCommand.php(280): Magnus->checkNumber(Object(AGI), Object(Calc), 0, true)
+#4 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleCommandRunner.php(67): MagnusCommand->run(Array)
+#5 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleApplication.php(91): CConsoleCommandRunner->run(Array)
+#6 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#7 /Library/WebServer/Documents/MBilling_5/agi.php(16): CApplication->run()
+#8 {main}
+---
+2017/04/26 12:12:56 [error] [php] fopen(/var/run/magnus/UserDiskSpacePid.php): failed to open stream: No such file or directory (/Library/WebServer/Documents/MBilling_5/protected/components/Process.php:45)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php(39): UserDiskSpaceCommand->isActive()
+#1 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleCommandRunner.php(67): UserDiskSpaceCommand->run()
+#2 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleApplication.php(91): CConsoleCommandRunner->run()
+#3 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#4 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/components/Process.php (45)
+in /Library/WebServer/Documents/MBilling_5/protected/components/Process.php (32)
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (39)
+2017/04/26 12:15:01 [error] [php] fopen(/var/run/magnus/UserDiskSpacePid.php): failed to open stream: Permission denied (/Library/WebServer/Documents/MBilling_5/protected/components/Process.php:45)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php(39): UserDiskSpaceCommand->isActive()
+#1 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleCommandRunner.php(67): UserDiskSpaceCommand->run()
+#2 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleApplication.php(91): CConsoleCommandRunner->run()
+#3 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#4 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/components/Process.php (45)
+in /Library/WebServer/Documents/MBilling_5/protected/components/Process.php (32)
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (39)
+2017/04/26 12:15:39 [error] [system.db.CDbCommand] CDbCommand::fetchAll() failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'disk_space' in 'where clause'. The SQL statement executed was: SELECT * FROM pkg_user WHERE disk_space > 0.
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (53)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/04/26 12:15:39 [error] [exception.CDbException] exception 'CDbException' with message 'CDbCommand failed to execute the SQL statement: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'disk_space' in 'where clause'. The SQL statement executed was: SELECT * FROM pkg_user WHERE disk_space > 0' in /Library/WebServer/Documents/MBilling_5/yii/framework/db/CDbCommand.php:541
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/db/CDbCommand.php(395): CDbCommand->queryInternal('fetchAll', Array, Array)
+#1 /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php(53): CDbCommand->queryAll()
+#2 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleCommandRunner.php(67): UserDiskSpaceCommand->run(Array)
+#3 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleApplication.php(91): CConsoleCommandRunner->run(Array)
+#4 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#5 /Library/WebServer/Documents/MBilling_5/cron.php(31): CApplication->run()
+#6 {main}
+---
+2017/04/26 12:19:47 [error] [php] Undefined variable: totalMB (/Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php:70)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (70)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/04/26 12:19:53 [error] [php] Undefined variable: totalMB (/Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php:70)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (70)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/04/26 13:07:35 [error] [php] Undefined variable: total (/Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php:70)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (70)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/04/26 13:08:06 [error] [php] Undefined variable: total (/Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php:70)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (70)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/04/26 13:20:16 [error] [php] Array to string conversion (/Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php:78)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (78)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/04/26 13:24:03 [error] [php] Undefined variable: total (/Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php:69)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (69)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/04/26 13:25:21 [error] [php] Undefined variable: total (/Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php:81)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (81)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/04/26 16:48:41 [error] [php] Undefined variable: lastFileTime (/Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php:92)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (92)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/04/26 16:49:29 [error] [php] Undefined variable: report (/Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php:110)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UserDiskSpaceCommand.php (110)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/03 18:30:32 [error] [system.db.CDbCommand] CDbCommand::fetchAll() failed: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '.callshop, a.id_offer, a.record_call, a.prefix_local, a.country FROM pkg_user AS' at line 1. The SQL statement executed was: SELECT credit, id_plan, active, typepaid, creditlimit, language, removeinterprefix, redial, enableexpire, UNIX_TIMESTAMP(expirationdate) expirationdate, expiredays, UNIX_TIMESTAMP(a.creationdate) creationdate, a.id, a.restriction, a.id_user, a.calllimit, a.mix_monitor_format a.callshop, a.id_offer, a.record_call, a.prefix_local, a.country FROM pkg_user AS a LEFT JOIN pkg_plan ON id_plan=pkg_plan.id WHERE username='24315'.
+in /Library/WebServer/Documents/MBilling_5/protected/commands/AGI_Authenticate.Class.php (92)
+in /Library/WebServer/Documents/MBilling_5/protected/commands/MagnusCommand.php (261)
+in /Library/WebServer/Documents/MBilling_5/agi.php (16)
+2017/05/03 18:30:32 [error] [exception.CDbException] exception 'CDbException' with message 'CDbCommand failed to execute the SQL statement: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '.callshop, a.id_offer, a.record_call, a.prefix_local, a.country FROM pkg_user AS' at line 1. The SQL statement executed was: SELECT credit, id_plan, active, typepaid, creditlimit, language, removeinterprefix, redial, enableexpire, UNIX_TIMESTAMP(expirationdate) expirationdate, expiredays, UNIX_TIMESTAMP(a.creationdate) creationdate, a.id, a.restriction, a.id_user, a.calllimit, a.mix_monitor_format a.callshop, a.id_offer, a.record_call, a.prefix_local, a.country FROM pkg_user AS a LEFT JOIN pkg_plan ON id_plan=pkg_plan.id WHERE username='24315'' in /Library/WebServer/Documents/MBilling_5/yii/framework/db/CDbCommand.php:541
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/db/CDbCommand.php(395): CDbCommand->queryInternal('fetchAll', Array, Array)
+#1 /Library/WebServer/Documents/MBilling_5/protected/commands/AGI_Authenticate.Class.php(92): CDbCommand->queryAll()
+#2 /Library/WebServer/Documents/MBilling_5/protected/commands/MagnusCommand.php(261): AGI_Authenticate->authenticateUser(Object(AGI), Object(Magnus))
+#3 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleCommandRunner.php(67): MagnusCommand->run(Array)
+#4 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleApplication.php(91): CConsoleCommandRunner->run(Array)
+#5 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#6 /Library/WebServer/Documents/MBilling_5/agi.php(16): CApplication->run()
+#7 {main}
+---
+2017/05/12 14:33:12 [error] [system.db.CDbCommand] CDbCommand::execute() failed: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'send_to_callback_1'. The SQL statement executed was: ALTER TABLE  `pkg_did` ADD  `send_to_callback_1` TINYINT( 1 ) NOT NULL DEFAULT  '0',
+			ADD  `send_to_callback_2` TINYINT( 1 ) NOT NULL DEFAULT  '0',
+			ADD  `send_to_callback_3` TINYINT( 1 ) NOT NULL DEFAULT  '0'.
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UpdateMysqlCommand.php (685)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/12 14:33:12 [error] [system.db.CDbCommand] CDbCommand::execute() failed: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'ringfalse'. The SQL statement executed was: ALTER TABLE  `pkg_sip` ADD  `ringfalse` TINYINT( 1 ) NOT NULL DEFAULT  '0'.
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UpdateMysqlCommand.php (700)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/12 14:33:12 [error] [system.db.CDbCommand] CDbCommand::execute() failed: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'state_number'. The SQL statement executed was: ALTER TABLE  `pkg_user` 
+			ADD  `state_number` INT( 40 ) DEFAULT NULL AFTER  `company_website` ,
+			
+			ADD  `disk_space` INT( 10 ) NOT NULL DEFAULT  '-1',
+			ADD  `sipaccountlimit` INT( 10 ) NOT NULL DEFAULT  '-1',
+			ADD  `calllimit` INT( 10 ) NOT NULL DEFAULT  '-1',
+			ADD mix_monitor_format VARCHAR(5) DEFAULT 'gsm';
+			ALTER TABLE  `pkg_sip` ADD  `record_call` TINYINT( 1 ) NOT NULL DEFAULT  '0';
+			.
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UpdateMysqlCommand.php (723)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/12 14:33:12 [error] [system.db.CDbCommand] CDbCommand::execute() failed: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'id_plan'. The SQL statement executed was: 
+			ALTER TABLE  `pkg_campaign` ADD  `id_plan` INT( 11 ) NULL DEFAULT NULL AFTER  `id_user`;
+			ALTER TABLE `pkg_campaign`  ADD CONSTRAINT `fk_pkg_plan_pkg_campaign` FOREIGN KEY (`id_plan`) REFERENCES `pkg_plan` (`id`);
+			.
+in /Library/WebServer/Documents/MBilling_5/protected/commands/UpdateMysqlCommand.php (762)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/29 12:28:53 [error] [php] fopen(/var/run/magnus/ServicesCheckPid.php): failed to open stream: No such file or directory (/Library/WebServer/Documents/MBilling_5/protected/components/Process.php:45)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php(43): ServicesCheckCommand->isActive()
+#1 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleCommandRunner.php(67): ServicesCheckCommand->run()
+#2 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleApplication.php(91): CConsoleCommandRunner->run()
+#3 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#4 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/components/Process.php (45)
+in /Library/WebServer/Documents/MBilling_5/protected/components/Process.php (32)
+in /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php (43)
+2017/05/29 12:40:13 [error] [php] Undefined variable: diff_reservation_daytop (/Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php:89)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php (89)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/29 13:33:47 [error] [php] Undefined variable: plans (/Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php:108)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php (108)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/29 15:01:50 [error] [php] Undefined variable: plans (/Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php:148)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php (148)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/29 15:04:17 [error] [php] Undefined variable: modelServicesUse (/Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php:127)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php (127)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/29 15:49:49 [error] [exception.Exception] exception 'Exception' with message 'SMTP Error: Could not connect to SMTP host.
+' in /Library/WebServer/Documents/MBilling_5/protected/components/Mail.php:398
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/protected/models/Refill.php(134): Mail->send()
+#1 /Library/WebServer/Documents/MBilling_5/yii/framework/db/ar/CActiveRecord.php(1043): Refill->afterSave()
+#2 /Library/WebServer/Documents/MBilling_5/yii/framework/db/ar/CActiveRecord.php(795): CActiveRecord->insert(NULL)
+#3 /Library/WebServer/Documents/MBilling_5/protected/components/Process.php(99): CActiveRecord->save()
+#4 /Library/WebServer/Documents/MBilling_5/protected/components/ServicesProcess.php(217): Process->releaseUserCredit('3', '-10.0000', 'Monthly payment...')
+#5 /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php(118): ServicesProcess->payService(Object(ServicesUse))
+#6 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleCommandRunner.php(67): ServicesCheckCommand->run(Array)
+#7 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleApplication.php(91): CConsoleCommandRunner->run(Array)
+#8 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#9 /Library/WebServer/Documents/MBilling_5/cron.php(31): CApplication->run()
+#10 {main}
+---
+2017/05/29 16:08:18 [error] [php] Undefined offset: 55 (/Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php:53)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php (53)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/29 16:08:24 [error] [php] Undefined offset: 55 (/Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php:53)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php (53)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/29 16:08:35 [error] [php] Undefined offset: 55 (/Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php:53)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#1 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php (53)
+in /Library/WebServer/Documents/MBilling_5/cron.php (31)
+2017/05/29 16:17:00 [error] [php] fopen(/var/run/magnus/ServicesCheckPid.php): failed to open stream: No such file or directory (/Library/WebServer/Documents/MBilling_5/protected/components/Process.php:45)
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php(44): ServicesCheckCommand->isActive()
+#1 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleCommandRunner.php(67): ServicesCheckCommand->run()
+#2 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleApplication.php(91): CConsoleCommandRunner->run()
+#3 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#4 /Library/WebServer/Documents/MBilling_5/cron.php(31): CConsoleApplication->run()
+
+in /Library/WebServer/Documents/MBilling_5/protected/components/Process.php (45)
+in /Library/WebServer/Documents/MBilling_5/protected/components/Process.php (32)
+in /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php (44)
+2017/05/29 16:19:26 [error] [exception.Exception] exception 'Exception' with message 'SMTP Error: Could not connect to SMTP host.
+' in /Library/WebServer/Documents/MBilling_5/protected/components/Mail.php:398
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/protected/models/Refill.php(134): Mail->send()
+#1 /Library/WebServer/Documents/MBilling_5/yii/framework/db/ar/CActiveRecord.php(1043): Refill->afterSave()
+#2 /Library/WebServer/Documents/MBilling_5/yii/framework/db/ar/CActiveRecord.php(795): CActiveRecord->insert(NULL)
+#3 /Library/WebServer/Documents/MBilling_5/protected/components/Process.php(99): CActiveRecord->save()
+#4 /Library/WebServer/Documents/MBilling_5/protected/components/ServicesProcess.php(217): Process->releaseUserCredit('3', '-50.0000', 'Monthly payment...')
+#5 /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php(143): ServicesProcess->payService(Object(ServicesUse))
+#6 /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php(107): ServicesCheckCommand->checkIfUserHaveCredit(Object(ServicesUse))
+#7 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleCommandRunner.php(67): ServicesCheckCommand->run(Array)
+#8 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleApplication.php(91): CConsoleCommandRunner->run(Array)
+#9 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#10 /Library/WebServer/Documents/MBilling_5/cron.php(31): CApplication->run()
+#11 {main}
+---
+2017/05/29 16:20:45 [error] [exception.Exception] exception 'Exception' with message 'SMTP Error: Could not connect to SMTP host.
+' in /Library/WebServer/Documents/MBilling_5/protected/components/Mail.php:398
+Stack trace:
+#0 /Library/WebServer/Documents/MBilling_5/protected/models/Refill.php(134): Mail->send()
+#1 /Library/WebServer/Documents/MBilling_5/yii/framework/db/ar/CActiveRecord.php(1043): Refill->afterSave()
+#2 /Library/WebServer/Documents/MBilling_5/yii/framework/db/ar/CActiveRecord.php(795): CActiveRecord->insert(NULL)
+#3 /Library/WebServer/Documents/MBilling_5/protected/components/Process.php(99): CActiveRecord->save()
+#4 /Library/WebServer/Documents/MBilling_5/protected/components/ServicesProcess.php(217): Process->releaseUserCredit('3', '-50.0000', 'Monthly payment...')
+#5 /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php(143): ServicesProcess->payService(Object(ServicesUse))
+#6 /Library/WebServer/Documents/MBilling_5/protected/commands/ServicesCheckCommand.php(117): ServicesCheckCommand->checkIfUserHaveCredit(Object(ServicesUse))
+#7 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleCommandRunner.php(67): ServicesCheckCommand->run(Array)
+#8 /Library/WebServer/Documents/MBilling_5/yii/framework/console/CConsoleApplication.php(91): CConsoleCommandRunner->run(Array)
+#9 /Library/WebServer/Documents/MBilling_5/yii/framework/base/CApplication.php(169): CConsoleApplication->processRequest()
+#10 /Library/WebServer/Documents/MBilling_5/cron.php(31): CApplication->run()
+#11 {main}
+---

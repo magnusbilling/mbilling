@@ -227,7 +227,7 @@ class AGI_MassiveCall
 
 
             }elseif ($forwardOptionType == 'custom') {
-                
+                $agi->set_variable("CALLERID(num)",$destination);
                 if(preg_match('/AGI/', $forwardOption[1]))
                 {
                     $agi = explode("|", $forwardOption[1]);
@@ -485,7 +485,8 @@ class AGI_MassiveCall
         $resultCard = Yii::app()->db->createCommand( $sql )->queryAll();
         $agi->verbose($sql,25);
 
-        $MAGNUS->id_plan = $resultCard[0]['id_plan'];
+
+        $MAGNUS->id_plan = $resultCampaign[0]['id_plan'] > 0 ? $resultCampaign[0]['id_plan'] : $resultCard[0]['id_plan'];
         if($duration > 1){
 
 

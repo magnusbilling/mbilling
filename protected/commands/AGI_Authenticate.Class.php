@@ -39,7 +39,7 @@ class AGI_Authenticate
                     "b.id_plan, b.active, b.typepaid, b.creditlimit, b.language, b.username,".
                     "removeinterprefix, b.redial, enableexpire, UNIX_TIMESTAMP(expirationdate), ".
                     "expiredays, UNIX_TIMESTAMP(b.creationdate), b.id, b.restriction, ".
-                    "b.id_user, b.callshop, b.id_offer, b.record_call, b.prefix_local , b.country ".
+                    "b.id_user, b.callshop, b.id_offer, b.record_call, b.prefix_local , b.country, b.calllimit, b.mix_monitor_format ".
                     "FROM pkg_callerid AS a ".
                     "LEFT JOIN pkg_user AS b ON a.id_user=b.id ".
                     "LEFT JOIN pkg_plan ON b.id_plan=pkg_plan.id ".
@@ -84,7 +84,7 @@ class AGI_Authenticate
 
             $sql = "SELECT credit, id_plan, active, typepaid, creditlimit, language, removeinterprefix, ".
                     "redial, enableexpire, UNIX_TIMESTAMP(expirationdate) expirationdate, expiredays, ".
-                    "UNIX_TIMESTAMP(a.creationdate) creationdate, a.id, a.restriction, a.id_user, ".
+                    "UNIX_TIMESTAMP(a.creationdate) creationdate, a.id, a.restriction, a.id_user, a.calllimit, a.mix_monitor_format, ".
                     "a.callshop, a.id_offer, a.record_call, a.prefix_local, a.country ".
                     "FROM pkg_user AS a ".
                     "LEFT JOIN pkg_plan ON id_plan=pkg_plan.id WHERE username='" . $MAGNUS->username . "'";
@@ -128,7 +128,7 @@ class AGI_Authenticate
                         enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays,
                         UNIX_TIMESTAMP(pkg_user.creationdate), pkg_user.lastname, pkg_user.firstname, pkg_user.email,
                         pkg_user.password, pkg_user.id, pkg_user.restriction, pkg_user.id_user,
-                        pkg_user.callshop, pkg_user.id_offer, pkg_user.record_call, pkg_user.prefix_local, pkg_user.country
+                        pkg_user.callshop, pkg_user.id_offer, pkg_user.record_call, pkg_user.prefix_local, pkg_user.country, calllimit, mix_monitor_format
                         FROM pkg_user LEFT JOIN pkg_plan ON id_plan=pkg_plan.id
                         WHERE callingcard_pin='" . $tech_prefix . "'";
                 $result = Yii::app()->db->createCommand( $sql )->queryAll();
@@ -212,7 +212,7 @@ class AGI_Authenticate
                     $sql = "SELECT credit, id_plan, active, typepaid, creditlimit, language, removeinterprefix, ".
                             "redial, enableexpire, UNIX_TIMESTAMP(expirationdate), expiredays, ".
                             "UNIX_TIMESTAMP(a.creationdate), a.id, a.restriction, a.id_user, ".
-                            "a.callshop, a.id_offer, a.record_call, a.prefix_local, a.country ".
+                            "a.callshop, a.id_offer, a.record_call, a.prefix_local, a.country, a.calllimit, a.mix_monitor_format ".
                             "FROM pkg_user AS a ".
                             "LEFT JOIN pkg_plan ON id_plan=pkg_plan.id WHERE username='" . $MAGNUS->username . "'";
                     $agi->verbose($sql,25);
@@ -409,6 +409,54 @@ class AGI_Authenticate
             }
         }
 
+
+        if ($result[0]['calllimit'] == 0) {
+                $agi->verbose( "Send Congestion user call limit",3);
+                $agi->execute((congestion), Congestion);
+                return - 2;
+        }
+        else if ($result[0]['calllimit'] > 0) {
+            //check user call limit
+            $asmanager = new AGI_AsteriskManager();
+            $asmanager->connect('localhost', 'magnus', 'magnussolution');
+
+            $channels = $asmanager->command("core show channels concise");
+        
+            $channels = explode("\n", $channels["data"]);
+
+            //Get all sipaccount from accountcode
+            $sql = "SELECT name FROM pkg_sip WHERE accountcode = '".$MAGNUS->accountcode."'";
+            $sipAllNamesResult = Yii::app()->db->createCommand( $sql )->queryAll();
+            $namesSip = '';
+            foreach ($sipAllNamesResult as $key => $name)
+                $namesSip .= $name['name'].'|';            
+            $namesSip = substr($namesSip,0, -1); 
+
+            $calls = 0;
+            foreach ($channels as $key => $line){
+                if (preg_match("/^SIP\/($namesSip)-/", $line)){
+                    $agi->verbose($line);
+                    $calls++;
+                }
+            }
+            $asmanager->disconnect();
+
+            if ($calls >  $result[0]['calllimit']) {
+                $agi->verbose( "Send Congestion user call limit",3);
+                $agi->execute((congestion), Congestion);
+                return - 2;
+            }
+        }
+
+        $sql = "SELECT record_call FROM pkg_sip WHERE name = '$MAGNUS->sip_account'";
+        $sipRecordResult = Yii::app()->db->createCommand( $sql )->queryAll();
+        $agi->verbose($sql,25);
+        $MAGNUS->record_call = $sipRecordResult[0]['record_call'];
+
+
+        if ($result[0]['mix_monitor_format'] != $MAGNUS->mix_monitor_format)
+            $MAGNUS->mix_monitor_format = $result[0]['mix_monitor_format'];
+        
         //tech prefix to route
         $sql = "SELECT id FROM pkg_plan WHERE  techprefix = '".substr($MAGNUS->dnid, 0,5)."'";
         $techPrefixresult = Yii::app()->db->createCommand( $sql )->queryAll();
@@ -420,11 +468,8 @@ class AGI_Authenticate
 
         if ($MAGNUS->config['global']['intra-inter'] == '1')
         {
-            $ramal = explode("-", $MAGNUS->channel);
-            $ramal = explode("/", $ramal[0]);
-            $ramal = $ramal[1];
 
-            $sql = "SELECT callerid FROM pkg_sip WHERE name = '$ramal'";
+            $sql = "SELECT callerid FROM pkg_sip WHERE name = ' $MAGNUS->sip_account'";
             $callerIDresult = Yii::app()->db->createCommand( $sql )->queryAll();
             $agi->verbose($sql,25);
 
@@ -522,15 +567,13 @@ class AGI_Authenticate
         //verfica se é cliente de callshop, e se a cabina esta ativa
         if ($MAGNUS->callshop)
         {
-            $ramal = explode("-", $MAGNUS->channel);
-            $ramal = explode("/", $ramal[0]);
-            $ramal = $ramal[1];
-            $sql = "SELECT status FROM pkg_sip WHERE name = '$ramal'";
+
+            $sql = "SELECT status FROM pkg_sip WHERE name = '$MAGNUS->sip_account'";
             $result = Yii::app()->db->createCommand( $sql )->queryAll();
             $agi->verbose( $sql,25);
             if ($result[0]['status'] == 0)
             {
-                $agi->verbose( "CABINA DISABLED " . $ramal,3); 
+                $agi->verbose( "CABINA DISABLED " . $MAGNUS->sip_account,3); 
                 return -1;
             }
         }

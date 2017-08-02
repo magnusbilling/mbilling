@@ -54,7 +54,7 @@ class Campaign extends Model
 	{
 		return array(
 			array('name, id_user', 'required'),
-			array('id_user, digit_authorize, restrict_phone, secondusedreal, enable_max_call, nb_callmade, type, monday, tuesday, wednesday, thursday, friday, saturday, sunday, status, frequency', 'numerical', 'integerOnly'=>true),
+			array('id_user, digit_authorize, id_plan, restrict_phone, secondusedreal, enable_max_call, nb_callmade, type, monday, tuesday, wednesday, thursday, friday, saturday, sunday, status, frequency', 'numerical', 'integerOnly'=>true),
 			array('name, forward_number, audio, audio_2', 'length', 'max'=>100),
 			array('startingdate, expirationdate', 'length', 'max'=>50),
 			array('daily_start_time, daily_stop_time', 'length', 'max'=>8),
@@ -68,7 +68,8 @@ class Campaign extends Model
 	public function relations()
 	{
 		return array(
-			'idUser' => array(self::BELONGS_TO, 'User', 'id_user')
+			'idUser' => array(self::BELONGS_TO, 'User', 'id_user'),
+			'idPlan' => array(self::BELONGS_TO, 'Plan', 'id_plan')
 		);
 	}
 

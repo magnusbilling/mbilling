@@ -50,6 +50,7 @@ class AGI_Ivr
 		$nowHour     = date('H:i:s');
 
 
+
 		if ($nowDay != 'Sun' &&  $nowDay != 'Sat')
 		{
 		  if ($nowHour > $monFriStart && $nowHour < $monFriStop)
@@ -158,7 +159,8 @@ class AGI_Ivr
 		  		$insertCDR = true;
 				$sql = "SELECT name FROM pkg_sip WHERE id = ". $optionValue;	
 				$agi->verbose($sql,25);		
-				$resultSIP      = Yii::app()->db->createCommand( $sql )->queryAll();
+				$resultSIP      = Yii::app()->db->createCommand( $sql )->queryAll();				
+        			$MAGNUS->record_call = $resultSIP[0]['record_call'];
 
 				$dialparams = $dialparams = $MAGNUS->agiconfig['dialcommand_param_sipiax_friend'];
 				$dialparams = str_replace("%timeout%", 3600, $dialparams);

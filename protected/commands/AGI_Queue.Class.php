@@ -134,6 +134,10 @@ class AGI_Queue
        	$resultRecord = Yii::app()->db->createCommand( $sql )->queryAll();
        	$MAGNUS->record_call = $resultRecord[0]['record_call'];
        	
+       	$sql = "SELECT record_call FROM pkg_sip WHERE name = '$operator'";
+        	$sipRecordResult = Yii::app()->db->createCommand( $sql )->queryAll();
+        	$agi->verbose($sql,25);
+        	$MAGNUS->record_call = $sipRecordResult[0]['record_call'];
 
 		if ($MAGNUS->agiconfig['record_call'] == 1 || $MAGNUS->record_call == 1)
 		{

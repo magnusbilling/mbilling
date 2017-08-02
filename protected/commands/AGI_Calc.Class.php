@@ -600,6 +600,13 @@ class Calc
 
 
         if ($terminatecauseid == 1) {
+
+            if ( $agi->get_variable( "IDCALLBACK", true ) ) {
+                $sql = "UPDATE pkg_callback SET last_attempt_time = NOW(), status = 3 WHERE id = ".$agi->get_variable( "IDCALLBACK", true );
+                $agi->verbose($sql);
+                Yii::app()->db->createCommand($sql)->execute(); 
+            }
+        
             $table = 'pkg_cdr';
             $fields = "uniqueid, sessionid, id_user, starttime, sessiontime, real_sessiontime, calledstation, terminatecauseid, ".
             "stoptime, sessionbill, id_plan, id_trunk, src, sipiax, buycost, id_prefix, agent_bill";
@@ -760,7 +767,7 @@ class Calc
             $ramal = explode("-", $MAGNUS->channel);
             $ramal = explode("/", $ramal[0]);
 
-            $sql = "SELECT directmedia FROM pkg_sip WHERE name='$ramal[1]'";
+            $sql = "SELECT directmedia,ringfalse FROM pkg_sip WHERE name='$ramal[1]'";
             $resultDirectmedia = Yii::app()->db->createCommand( $sql )->queryAll();
             $agi->verbose($sql,25);
 
@@ -771,6 +778,14 @@ class Calc
                 $dialparams = preg_replace("/,rRL/", "", $dialparams);
                 $dialparams = preg_replace("/,RrL/", "", $dialparams);
             }
+
+            
+            if ($resultDirectmedia[0]['ringfalse'] == '1'){
+                $dialparams = preg_replace("/(^\,.*\,)/", "$1Rr", $dialparams);
+            }elseif ($resultDirectmedia[0]['ringfalse'] == '0') {
+                $dialparams = preg_replace("/Rr/", "", $dialparams);
+                $dialparams = preg_replace("/rR/", "", $dialparams);
+            }      
 
             if ($MAGNUS->agiconfig['record_call'] == 1 || $MAGNUS->record_call == 1)
             {
@@ -891,7 +906,7 @@ class Calc
                 $agi->verbose( "K=$k -> ANSWEREDTIME=" . $this->answeredtime . "-DIALSTATUS=" . $this->dialstatus,10);
                 $destination = $old_destination;
                
-                $sql = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, maxuse, if_max_use, allow_error, credit_control, credit FROM pkg_trunk LEFT JOIN pkg_provider ON pkg_trunk.id_provider = pkg_provider.id WHERE pkg_trunk.id='$failover_trunk'";
+                $sql = "SELECT trunkprefix, providertech, providerip, removeprefix, failover_trunk, status, inuse, maxuse, if_max_use, allow_error, credit_control, credit, directmedia FROM pkg_trunk LEFT JOIN pkg_provider ON pkg_trunk.id_provider = pkg_provider.id WHERE pkg_trunk.id='$failover_trunk'";
                 $result = Yii::app()->db->createCommand( $sql )->queryAll();
                 $agi->verbose($sql,25);
                 
@@ -930,6 +945,22 @@ class Calc
                     }
                     $agi->verbose("Now using failover trunk -> TRUNK => $ipaddress -> ERROR => $this->dialstatus ",6);
                     $dialparams = preg_replace("/\%timeout\%/", min($timeout * 1000, $max_long), $MAGNUS->agiconfig['dialcommand_param']);
+
+                    if ($resultDirectmedia[0]['directmedia'] == 'yes' && $result[0]['directmedia'] == 'yes')
+                    {
+                        $agi->verbose( "DIRECT MEDIA ACTIVE",10);
+                        $dialparams = preg_replace("/,L/", "", $dialparams);
+                        $dialparams = preg_replace("/,rRL/", "", $dialparams);
+                        $dialparams = preg_replace("/,RrL/", "", $dialparams);
+                    }
+
+                    
+                    if ($resultDirectmedia[0]['ringfalse'] == '1'){
+                        $dialparams = preg_replace("/(^\,.*\,)/", "$1Rr", $dialparams);
+                    }elseif ($resultDirectmedia[0]['ringfalse'] == '0') {
+                        $dialparams = preg_replace("/Rr/", "", $dialparams);
+                        $dialparams = preg_replace("/rR/", "", $dialparams);
+                    }
 
 
                     if ($pos_dialingnumber !== false)

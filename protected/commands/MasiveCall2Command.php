@@ -93,7 +93,7 @@ class MasiveCall2Command extends CConsoleCommand
 				//$nbpage = 10;
 
 				$sql ="SELECT pkg_phonenumber.id as pkg_phonenumber_id, pkg_phonenumber.number, pkg_campaign.id as pkg_campaign_id, pkg_campaign.forward_number, pkg_phonenumber.id_phonebook AS id_phonebook,
-				pkg_user.id , pkg_user.id_plan, pkg_user.username, pkg_campaign.type, pkg_campaign.description, pkg_phonenumber.name, pkg_phonenumber.city AS number_city, try, pkg_user.credit, restrict_phone, pkg_user.id_user AS id_agent
+				pkg_user.id , pkg_user.id_plan, pkg_campaign.id_plan AS campaign_id_plan, pkg_user.username, pkg_campaign.type, pkg_campaign.description, pkg_phonenumber.name, pkg_phonenumber.city AS number_city, try, pkg_user.credit, restrict_phone, pkg_user.id_user AS id_agent
 				FROM pkg_phonenumber , pkg_phonebook , pkg_campaign_phonebook, pkg_campaign, pkg_user 
 				WHERE pkg_phonenumber.id_phonebook = pkg_phonebook.id AND pkg_campaign_phonebook.id_phonebook = pkg_phonebook.id 
 				AND pkg_campaign_phonebook.id_campaign = pkg_campaign.id AND pkg_campaign.id_user = pkg_user.id AND pkg_campaign.status = 1 
@@ -134,6 +134,10 @@ class MasiveCall2Command extends CConsoleCommand
 				$limitTrunk = 0;
 				foreach ($callResult as $phone) 
 				{
+
+					if ($phone['campaign_id_plan'] > 0) 
+						$phone['id_plan'] = $phone['campaign_id_plan'];
+
 					if ($phone['number'] == '') {
 						$sql = "UPDATE pkg_phonenumber SET status = 0 WHERE id = ".$phone['pkg_phonenumber_id'];
 						echo $sql;

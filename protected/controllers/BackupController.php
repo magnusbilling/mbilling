@@ -22,182 +22,209 @@
 
 class BackupController extends Controller
 {
-	private $diretory = "/usr/local/src/";
-	public function actionRead()
-	{
-		if (Yii::app()->session['isAdmin'] == false)
-			exit;
-		if (!Yii::app()->session['id_user'])
+    private $diretory = "/usr/local/src/";
+    public function actionRead($asJson = true)
+    {
+        if (Yii::app()->session['isAdmin'] == false) {
             exit;
-		$result = $this->scan_dir($this->diretory,1);
+        }
 
-		$values = array();
-		$start = $_GET['start'];
-		$limit = $_GET['limit'];
-
-		for ($i=0; $i < count($result); $i++) {
-
-			if ($i < $start) {
-				continue;
-			}
-
-			if (!preg_match("/backup_voip_Magnus/", $result[$i]) ) {
-				continue;
-			}
-			$size = filesize($this->diretory.$result[$i]) / 1000000;
-			$values []= array(
-				'id' => $i, 
-				'name' => $result[$i],
-				'size' => number_format($size,2) . ' MB');
-		}
-		
-
-		//
-		# envia o json requisitado
-		echo json_encode(array(
-			$this->nameRoot => $values,
-			$this->nameCount => $i,
-			$this->nameSum => array()
-		));
-	}
-	public function actionDownload()
-	{
-		if (Yii::app()->session['isAdmin'] == false)
-			exit;
-		if (!Yii::app()->session['id_user'])
+        if (!Yii::app()->session['id_user']) {
             exit;
+        }
 
-		$file = $_GET['file'];
+        $result = $this->scan_dir($this->diretory, 1);
 
-		$pathFileCsv = '/usr/local/src/';
-		$path = $pathFileCsv.$file;
+        $values = array();
+        $start  = $_GET['start'];
+        $limit  = $_GET['limit'];
 
-		header('Content-type: application/csv');
-		header('Content-Disposition: inline; filename="' . $file . '"');
-		header('Content-Transfer-Encoding: binary');
-		header('Accept-Ranges: bytes');
-		ob_clean();
-		flush();
-		readfile($path);
+        for ($i = 0; $i < count($result); $i++) {
 
-	}
-	public function scan_dir($dir) {
-		if (Yii::app()->session['isAdmin'] == false)
-			exit;
-		if (!Yii::app()->session['id_user'])
+            if ($i < $start) {
+                continue;
+            }
+
+            if (!preg_match("/backup_voip_Magnus/", $result[$i])) {
+                continue;
+            }
+            $size     = filesize($this->diretory . $result[$i]) / 1000000;
+            $values[] = array(
+                'id'   => $i,
+                'name' => $result[$i],
+                'size' => number_format($size, 2) . ' MB');
+        }
+
+        //
+        # envia o json requisitado
+        echo json_encode(array(
+            $this->nameRoot  => $values,
+            $this->nameCount => $i,
+            $this->nameSum   => array(),
+        ));
+    }
+    public function actionDownload()
+    {
+        if (Yii::app()->session['isAdmin'] == false) {
             exit;
-	    	$ignored = array('.', '..', '.svn', '.htaccess');
+        }
 
-	    	$files = array();    
-	    	foreach (scandir($dir) as $file) {
-	        	if (in_array($file, $ignored)) continue;
-	       	$files[$file] = filemtime($dir . '/' . $file);
-	    	}
-
-	    	arsort($files);
-	   	$files = array_keys($files);
-
-	    	return ($files) ? $files : false;
-	}
-
-	public function actionDestroy()
-	{
-		if (Yii::app()->session['isAdmin'] == false)
-			exit;
-		if (!Yii::app()->session['id_user'])
+        if (!Yii::app()->session['id_user']) {
             exit;
-		$ids = json_decode($_POST['ids']);
-		foreach ($ids as $key => $value) {
-			unlink($this->diretory.$value);
-		}
+        }
 
-		# retorna o resultado da execucao
-		echo json_encode(array(
-			$this->nameSuccess => $this->success,
-			$this->nameMsg => $this->success
-		));
-	}
+        $file = $_GET['file'];
 
-	public function actionSave()
-	{
-		if (Yii::app()->session['isAdmin'] == false)
-			exit;
-		if (!Yii::app()->session['id_user'])
+        $pathFileCsv = '/usr/local/src/';
+        $path        = $pathFileCsv . $file;
+
+        header('Content-type: application/csv');
+        header('Content-Disposition: inline; filename="' . $file . '"');
+        header('Content-Transfer-Encoding: binary');
+        header('Accept-Ranges: bytes');
+        ob_clean();
+        flush();
+        readfile($path);
+
+    }
+    public function scan_dir($dir)
+    {
+        if (Yii::app()->session['isAdmin'] == false) {
             exit;
-		exec("php /var/www/html/mbilling/cron.php Backup");
+        }
 
-		echo json_encode(array(
-			$this->nameSuccess => $this->success,
-			$this->nameRoot => $this->attributes,
-			$this->nameMsg => $this->msg . ' Backup in process, this task can spend many time to finish.'
-		));
+        if (!Yii::app()->session['id_user']) {
+            exit;
+        }
 
-	}
+        $ignored = array('.', '..', '.svn', '.htaccess');
 
-	public function actionImportFromCsv()
-	{	
-		if (Yii::app()->session['isAdmin'] == false)
-			exit;
-		if (!Yii::app()->session['id_user'])
-            exit;	
-		ini_set("memory_limit", "1024M");
-		ini_set("upload_max_filesize", "100M");
-		ini_set("max_execution_time", "900");
-		if (isset($_FILES['file']['tmp_name'])) {
+        $files = array();
+        foreach (scandir($dir) as $file) {
+            if (in_array($file, $ignored)) {
+                continue;
+            }
 
-			$uploadfile = "/usr/local/src/".$_FILES['file']['name'];
-			Yii::log($uploadfile,'info');
-			move_uploaded_file($_FILES["file"]["tmp_name"], $uploadfile);
-		}
-		echo json_encode(array(
-				$this->nameSuccess => true,
-				$this->nameMsg => $this->success
-			));
-		
-	}
+            $files[$file] = filemtime($dir . '/' . $file);
+        }
 
-	public function actionRecovery()
-	{
-		if (Yii::app()->session['isAdmin'] == false)
-			exit;
-		if (!Yii::app()->session['id_user'])
-            	exit;
-		$name = json_decode($_POST['id']);
-		
+        arsort($files);
+        $files = array_keys($files);
 
-		exec("cd /usr/local/src && tar xzvf /usr/local/src/".$name);
+        return ($files) ? $files : false;
+    }
 
+    public function actionDestroy()
+    {
+        if (Yii::app()->session['isAdmin'] == false) {
+            exit;
+        }
 
-		if (file_exists('/usr/local/src/tmp/base.sql')) {
+        if (!Yii::app()->session['id_user']) {
+            exit;
+        }
 
-			$configFile = '/etc/asterisk/res_config_mysql.conf';
-			$array		= parse_ini_file($configFile);
-			$username	= $array['dbuser'];
-			$password	= $array['dbpass'];
-			$base	= $array['dbname'];
+        $ids = json_decode($_POST['ids']);
+        foreach ($ids as $key => $value) {
+            unlink($this->diretory . $value);
+        }
 
-			$sql = "DROP database $base";
-			Yii::app()->db->createCommand($sql)->execute();
+        # retorna o resultado da execucao
+        echo json_encode(array(
+            $this->nameSuccess => $this->success,
+            $this->nameMsg     => $this->success,
+        ));
+    }
 
-			$sql = "CREATE database $base";
-			Yii::app()->db->createCommand($sql)->execute();			
+    public function actionSave()
+    {
+        if (Yii::app()->session['isAdmin'] == false) {
+            exit;
+        }
 
-			exec("mysql -u $username -p$password $base < /usr/local/src/tmp/base.sql > /dev/null 2>/dev/null &");
+        if (!Yii::app()->session['id_user']) {
+            exit;
+        }
 
-			echo json_encode(array(
-				$this->nameSuccess => $this->success,
-				$this->nameRoot => $this->attributes,
-				'msg' => $this->msg
-			));
-		}
-		else{
-			echo json_encode(array(
-				$this->nameSuccess => false,
-				$this->nameRoot => $this->attributes,
-				'msg' => "file not exists"
-			));
-		}
+        exec("php /var/www/html/mbilling/cron.php Backup");
 
-		exec("rm -rf /var/www/html/mbilling/tmp");
-	}
+        echo json_encode(array(
+            $this->nameSuccess => $this->success,
+            $this->nameRoot    => $this->attributes,
+            $this->nameMsg     => $this->msg . ' Backup in process, this task can spend many time to finish.',
+        ));
+
+    }
+
+    public function actionImportFromCsv()
+    {
+        if (Yii::app()->session['isAdmin'] == false) {
+            exit;
+        }
+
+        if (!Yii::app()->session['id_user']) {
+            exit;
+        }
+
+        ini_set("memory_limit", "1024M");
+        ini_set("upload_max_filesize", "100M");
+        ini_set("max_execution_time", "900");
+        if (isset($_FILES['file']['tmp_name'])) {
+
+            $uploadfile = "/usr/local/src/" . $_FILES['file']['name'];
+            Yii::log($uploadfile, 'info');
+            move_uploaded_file($_FILES["file"]["tmp_name"], $uploadfile);
+        }
+        echo json_encode(array(
+            $this->nameSuccess => true,
+            $this->nameMsg     => $this->success,
+        ));
+
+    }
+
+    public function actionRecovery()
+    {
+        if (Yii::app()->session['isAdmin'] == false) {
+            exit;
+        }
+
+        if (!Yii::app()->session['id_user']) {
+            exit;
+        }
+
+        $name = json_decode($_POST['id']);
+
+        exec("cd /usr/local/src && tar xzvf /usr/local/src/" . $name);
+
+        if (file_exists('/usr/local/src/tmp/base.sql')) {
+
+            $configFile = '/etc/asterisk/res_config_mysql.conf';
+            $array      = parse_ini_file($configFile);
+            $username   = $array['dbuser'];
+            $password   = $array['dbpass'];
+            $base       = $array['dbname'];
+
+            $sql = "DROP database $base";
+            Yii::app()->db->createCommand($sql)->execute();
+
+            $sql = "CREATE database $base";
+            Yii::app()->db->createCommand($sql)->execute();
+
+            exec("mysql -u $username -p$password $base < /usr/local/src/tmp/base.sql > /dev/null 2>/dev/null &");
+
+            echo json_encode(array(
+                $this->nameSuccess => $this->success,
+                $this->nameRoot    => $this->attributes,
+                'msg'              => $this->msg,
+            ));
+        } else {
+            echo json_encode(array(
+                $this->nameSuccess => false,
+                $this->nameRoot    => $this->attributes,
+                'msg'              => "file not exists",
+            ));
+        }
+
+        exec("rm -rf /var/www/html/mbilling/tmp");
+    }
 }

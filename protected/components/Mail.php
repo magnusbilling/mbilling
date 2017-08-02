@@ -75,8 +75,23 @@ class Mail {
 	static public $TYPE_PLAN_UNPAID = 'plan_unpaid';
 	static public $TYPE_PLAN_RELEASED = 'plan_released';
 
+
+
+
+	static public $TYPE_SERVICES_ACTIVATION = 'services_activation';
+	static public $TYPE_SERVICES_PENDING = 'services_pending';
+	static public $TYPE_SERVICES_PAID = 'services_paid';
+	static public $TYPE_SERVICES_UNPAID = 'services_unpaid';
+	static public $TYPE_SERVICES_RELEASED = 'services_released';
+
+	//Used by mail type = service
+	static public $SERVICE_PENDING_URL= '$service_pending_url$';
+	static public $SERVICE_NAME= '$service_name$';
+	static public $SERVICE_PRICE= '$service_price$';
+
+
 	static public $TYPE_INVOICE_TO_PAY = 'invoice_to_pay'; 	
-	
+	static public $TYPE_USER_DISK_SPACE = 'user_disk_space';
 	static public $TYPE_TEMPLATE1 = 'template1';
 	static public $TYPE_TEMPLATE2 = 'template2';
 	static public $TYPE_TEMPLATE3 = 'template3';
@@ -92,6 +107,12 @@ class Mail {
 
 	static public $OBS = '$obs$';
 
+
+	//Used by mail type = user_disk_space
+	static public $TIME_DELETE = '$time_deleted$';
+	static public $ACTUAL_DISK_USAGE = '$actual_disk_usage$';
+	static public $DISK_USADE_LIMIT = '$disk_usage_limit$';
+	
 	//Used by mail type = invoice_to_pay
 	static public $INVOICE_TITLE_KEY = '$invoice_title$';
 	static public $INVOICE_REFERENCE_KEY = '$invoice_reference$';
@@ -369,7 +390,7 @@ class Mail {
 		$mail->AddAddress($this->to_email);
 		$mail->CharSet = 'utf-8'; 
 		ob_start();
-		$mail->Send();
+		@$mail->Send();
 		$output = ob_get_contents();
 		ob_end_clean();
 		

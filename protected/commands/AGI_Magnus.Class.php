@@ -62,6 +62,7 @@ class Magnus
     public $id_agent;
     public $portabilidade=false;
     public $play_audio = false;
+    public $sip_account;
 
 
     public function Magnus()
@@ -147,6 +148,10 @@ class Magnus
             $agi->verbose($sql,25);
             $this->accountcode = $result[0]['accountcode'];
         }
+
+        $ramal = explode("-", $this->channel);
+        $ramal = explode("/", $ramal[0]);
+        $this->sip_account = $ramal[1];
 
 
         $pos_lt = strpos($this->CallerID, '<');
@@ -256,7 +261,7 @@ class Magnus
         
         if($this->dnid == 150)
         {
-            $agi->verbose( "SAY BALANCE : $MAGNUS->credit ",10);
+            $agi->verbose( "SAY BALANCE : $this->credit ",10);
             $this->sayBalance($agi, $this->credit);
             
             $prompt = "prepaid-final";
@@ -758,7 +763,14 @@ class Magnus
                 }
                 /* Call to custom dial*/
                 else if ($inst_listdestination['voip_call'] == 9)
-                {      
+                {
+                    if ($this->agiconfig['record_call'] == 1 || $this->record_call == 1)
+                    {
+                        $destino = $inst_listdestination['destination'];
+                        $command_mixmonitor = "MixMonitor {$this->accountcode}.{$did}.{$this->uniqueid}.".$this->mix_monitor_format.",b";
+                        $myres = $agi->execute($command_mixmonitor);
+                        $agi->verbose( $command_mixmonitor,6);
+                    }  
              
                     $agi->verbose("Ccall group $group ",6);                   
                     $dialstr = $inst_listdestination['destination'];
@@ -770,6 +782,11 @@ class Magnus
                     $dialstatus = $agi->get_variable("DIALSTATUS");
                     $dialstatus = $dialstatus['data'];
                     
+                    if ($this->agiconfig['record_call'] == 1  || $this->record_call == 1)
+                    {
+                        $myres = $agi->execute("StopMixMonitor");
+                        $agi->verbose( "EXEC StopMixMonitor (" . $this->uniqueid . ")",6);
+                    }
                 }
                 else
                 {
@@ -1291,7 +1308,7 @@ class Magnus
         if($prompt == "prepaid-card-expired")
         {
             $this->active = 0;
-            $sql = "UPDATE pkg_user SET status='0' WHERE id='" . $this->id_user . "'";
+            $sql = "UPDATE pkg_user SET active='0' WHERE id='" . $this->id_user . "'";
             Yii::app()->db->createCommand( $sql )->execute();
             $agi->verbose($sql,25);
         }
@@ -1496,6 +1513,54 @@ class Magnus
     {
         $PRECISION = 6;
         return round($number, $PRECISION);
+    }
+
+    public function checkIVRSchedule($model)
+    {
+        $weekDay      = date('D');
+
+        switch ($weekDay) {
+            case 'Sun':
+                $weekDay = $model[0]['TimeOfDay_sun']; 
+                break;
+            case 'Sat':
+                $weekDay = $model[0]['TimeOfDay_sat']; 
+                break;            
+            default:
+                $weekDay = $model[0]['TimeOfDay_monFri'];
+                break;
+        }
+
+        $hours = date('H');
+        $minutes = date('i');
+        $now = ($hours * 60) + $minutes;
+
+        $intervals = preg_split("/\|/",$weekDay);
+
+        foreach ($intervals as $key => $interval) {
+            $hours = explode('-', $interval);
+
+            $start = $hours[0];
+            $end = $hours[1];
+
+            #convert start hour to minutes
+            $hourInterval = explode(':', $start);        
+            $starthour = $hourInterval[0] * 60;
+            $start = $starthour + $hourInterval[1];
+
+            #convert end hour to minutes
+            $hourInterval = explode(':', $end);        
+            $starthour = $hourInterval[0] * 60;
+            $end = $starthour + $hourInterval[1];
+
+
+            if($now >= $start &&  $now <= $end){
+              return "open";
+            }
+        }
+
+        return "closed";
+
     }
 };
 ?>

@@ -73,7 +73,7 @@ class GroupModule extends Model
 	public function rules() {
 		return array(
 			array( 'id_group, id_module', 'required' ),
-			array( 'id_group, id_module, show_menu', 'numerical', 'integerOnly'=>true ),
+			array( 'id_group, id_module, show_menu, createShortCut, createQuickStart', 'numerical', 'integerOnly'=>true ),
 			array( 'action', 'length', 'max'=>5 ),
 		);
 	}

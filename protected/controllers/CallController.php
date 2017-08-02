@@ -158,66 +158,60 @@ class CallController extends Controller
 		return $arrPost;
 	}
 
-
 	public function actionSample()
 	{
 		$config = LoadConfig::getConfig();
-		$filter = isset($_POST['filter']) ? $_POST['filter'] : null;
+		$filter = isset($_REQUEST['filter']) ? $_REQUEST['filter'] : null;
 		$filter = $this->createCondition(json_decode($filter));
 		$this->filter = $filter = $this->extraFilter($filter);
 		
 
-		$id = json_decode($_POST['ids']);
+		$ids = json_decode($_REQUEST['ids']);
 
-		$ids = array();
-		
-		foreach ($id as $key => $value) {
-			array_push($ids, $value);
+		$ids = implode(",", $ids);
+
+		$modelCdr = Call::model()->findAll("t.id IN ($ids)");
+			
+		$folder = '/var/www/tmpmagnus/monitor';
+
+		if (!file_exists($folder)) {
+		    mkdir($folder, 0777, true);
 		}
-		$uniID = count($ids) == 1 ? true : false;
+		array_map('unlink', glob("$folder/*"));
 		
-		$filter = "t.id IN (".PreparedStatementHelper::arrayToParams($ids).")";			
-
-		$sql       = "SELECT uniqueid, calledstation, starttime, b.username, sipiax FROM pkg_cdr t 
-						JOIN pkg_user b ON t.id_user = b.id WHERE $filter";
-		$command = Yii::app()->db->createCommand($sql);
-		
-		PreparedStatementHelper::bindArrayParams($ids,$command,PDO::PARAM_INT);
-
-		$resultCdr = $command->queryAll();
-
-		$folder = '/var/www/html/mbilling/tmp';
-
-		exec("rm -rf $folder/*");
-		
-		if (count($resultCdr) > 0) 
+		if (count($modelCdr)) 
 		{
-			foreach ($resultCdr as $records)
-			{
-				$number    = $records['calledstation'];
-				$day       = $records['starttime'];
-				$uniqueid  = $records['uniqueid'];
-				$username  = $records['username'];
+			foreach ($modelCdr as $records)
+			{				
+				$number    = $records->calledstation;
+				$day       = $records->starttime;
+				$uniqueid  = $records->uniqueid;
+				$username  = $records->idUser->username;
 	
 				$mix_monitor_format = $config['global']['MixMonitor_format'];
+				
+				exec('cp -rf  /var/spool/asterisk/monitor/*.'.$uniqueid.'.* '.$folder.'/');
+			}		
 
-				exec('cp -rf  /var/spool/asterisk/monitor/*.'.$uniqueid.'.'.$mix_monitor_format.' '.$folder.'/'.$username.'-'.$uniqueid.'.'.$mix_monitor_format);
-			}	
-			if ($uniID == true) {
-				echo json_encode(array(
-					$this->nameSuccess => true,
-					$this->nameMsg =>  'http://'.$_SERVER['HTTP_HOST'].'/mbilling/tmp/'.$username.'-'.$uniqueid.'.'.$mix_monitor_format
-				));
+			exec("tar -czf ".$folder."/records_".Yii::app()->session['username'].".tar.gz ".$folder."/*");
+			$file_name = 'records_'.Yii::app()->session['username'].'.tar.gz';
+			$path = $folder.'/'.$file_name;
+			
 
-			}else{
-				exec("tar -czf ".$folder."/records_".$_SESSION['username'].".tar.gz ".$folder."/*");
-
-				echo json_encode(array(
-					$this->nameSuccess => true,
-					$this->nameMsg =>  'http://'.$_SERVER['HTTP_HOST'].'/mbilling/tmp/records_'.$_SESSION['username'].'.tar.gz'
-				));
-			}
-						
+			echo json_encode(array(
+				$this->nameSuccess => true,
+				$this->nameMsg =>  'success'
+			));			
+			
+			header('Content-Description: File Transfer');
+ 			header("Content-Type: application/x-tar");
+			header('Content-Disposition: attachment; filename=' . basename($file_name));
+			header("Content-Transfer-Encoding: binary");
+			header('Accept-Ranges: bytes');
+			header( 'Content-type: application/force-download' );
+			ob_clean();
+			flush();
+			readfile($path);				
 			
 		}
 		else

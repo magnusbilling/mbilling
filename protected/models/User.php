@@ -59,9 +59,9 @@ class User extends Model
 		return array(
 			array( 'username, password', 'required' ),
 			array( 'id_user, id_group, id_plan, id_offer, active, enableexpire, expiredays,
-				 typepaid, creditlimit, credit_notification, restriction, callingcard_pin, callshop, plan_day,
-				record_call, active_paypal, boleto, boleto_day', 'numerical', 'integerOnly'=>true ),
-			array( 'language', 'length', 'max'=>5 ),
+				 typepaid, creditlimit, calllimit, sipaccountlimit,credit_notification, restriction, callingcard_pin, callshop, plan_day,
+				record_call, active_paypal, boleto, boleto_day, disk_space', 'numerical', 'integerOnly'=>true ),
+			array( 'language,mix_monitor_format', 'length', 'max'=>5 ),
 			array( 'username, zipcode, phone, mobile, vat', 'length', 'max'=>20 ),
 			array( 'city, state, country, loginkey', 'length', 'max'=>40 ),
 			array( 'lastname, firstname, company_name, redial, prefix_local', 'length', 'max'=>50 ),
@@ -80,6 +80,8 @@ class User extends Model
 	public function checkusername( $attribute, $params ) {
 		if ( preg_match( '/ /', $this->username ) )
 			$this->addError( $attribute, Yii::t( 'yii', 'No space allow in username' ) );
+		if ( !preg_match( '/^[1-9]|^[A-Z]|^[a-z]/', $this->username ) )
+			$this->addError( $attribute, Yii::t( 'yii', 'Username need start with numbers or letters' ) );
 	}
 
 	public function checksecret( $attribute, $params ) {
@@ -186,6 +188,8 @@ class User extends Model
 
 			$rows = array_key_exists('rows', $_POST) ? json_decode($_POST['rows'], true) : $_POST;
 
+
+
 			$sql = "SELECT gu.id_user_type as typeActual
 					FROM pkg_user u 
 						INNER JOIN pkg_group_user gu
@@ -226,6 +230,15 @@ class User extends Model
 	}
 
 	public function afterSave() {
+
+		$rows = array_key_exists('rows', $_POST) ? json_decode($_POST['rows'], true) : $_POST;
+		if (isset($rows['record_call'])) {
+			$sql = "UPDATE pkg_sip SET record_call = :record_call WHERE id_user = :id_user";
+			$command = Yii::app()->db->createCommand($sql);
+			$command->bindValue(":record_call", $rows['record_call'], PDO::PARAM_STR);
+			$command->bindValue(":id_user", $this->id, PDO::PARAM_INT);
+			$command->execute();
+		}
 
 		if ( $this->isNewRecord ) {
 

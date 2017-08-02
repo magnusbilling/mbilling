@@ -23,36 +23,38 @@
 class CallOnlineChartController extends Controller
 {
 
-	public function init()
-	{
-		if (!Yii::app()->session['id_user'])
+    public function init()
+    {
+        if (!Yii::app()->session['id_user']) {
             exit;
-		$this->instanceModel = new CallOnlineChart;
-		$this->abstractModel = CallOnlineChart::model();
-		$this->titleReport   = Yii::t('yii','CallOnlineChart');
-		parent::init();
-	}
+        }
 
-	public function actionRead()
-	{
+        $this->instanceModel = new CallOnlineChart;
+        $this->abstractModel = CallOnlineChart::model();
+        $this->titleReport   = Yii::t('yii', 'CallOnlineChart');
+        parent::init();
+    }
 
-		$filter = isset($_GET['filter']) ? json_decode($_GET['filter']) : null;
+    public function actionRead($asJson = true)
+    {
 
-        	if (isset($filter) && $filter[0]->value == 'hour') {
-        		$sql = "SELECT id,  date , SUM(total) AS total, SUM(answer) AS answer
-            	FROM pkg_call_chart WHERE 1 
+        $filter = isset($_GET['filter']) ? json_decode($_GET['filter']) : null;
+
+        if (isset($filter) && $filter[0]->value == 'hour') {
+            $sql = "SELECT id,  date , SUM(total) AS total, SUM(answer) AS answer
+            	FROM pkg_call_chart WHERE 1
             	GROUP BY DATE_FORMAT( DATE, '%Y-%m-%d %H' )  ORDER BY id DESC LIMIT 24 ";
-        	}else{
-        		$sql = "SELECT id, date, total, answer  FROM pkg_call_chart WHERE 1 ORDER BY id DESC LIMIT 20 ";
-        	}
-        	$records = Yii::app()->db->createCommand($sql)->queryAll();		
+        } else {
+            $sql = "SELECT id, date, total, answer  FROM pkg_call_chart WHERE 1 ORDER BY id DESC LIMIT 20 ";
+        }
+        $records = Yii::app()->db->createCommand($sql)->queryAll();
 
-		# envia o json requisitado
-		echo json_encode(array(
-			$this->nameRoot => $records,
-			$this->nameCount => 0
-		));
-		
-	}
+        # envia o json requisitado
+        echo json_encode(array(
+            $this->nameRoot  => $records,
+            $this->nameCount => 0,
+        ));
+
+    }
 
 }

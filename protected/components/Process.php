@@ -76,7 +76,7 @@ class Process{
         $sql = "SELECT * FROM pkg_refill WHERE description LIKE '%$codigo%' AND id_user = $id_user";
         $refillResult = Yii::app()->db->createCommand($sql)->queryAll();
 
-        if(count($refillResult) > 0){
+        if(count($refillResult) > 0 && $codigo != 0){
 
             if($refillResult[0]['payment'] == 1){
                 //recarga ja efetuado e pagamento ja confirmado

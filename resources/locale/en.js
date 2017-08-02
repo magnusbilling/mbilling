@@ -21,6 +21,7 @@
         'calledstation' : 'Number',
         'idUserusername' : 'Username',
         'idPrefixprefix' : 'Prefix',
+        'pendings' : 'pending',
         ',': '.',
         '.': ',',
         'users' : 'Users',

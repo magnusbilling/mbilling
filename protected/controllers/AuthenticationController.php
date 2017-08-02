@@ -63,14 +63,16 @@ class AuthenticationController extends BaseController
 			{
 				$sql       = "SELECT * FROM pkg_sip WHERE name = :name ";
 				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(":name", $result[0]['username'], PDO::PARAM_STR);
+				$command->bindValue(":name", $user, PDO::PARAM_STR);
 				$resultSIP = $command->queryAll();	
 
 				if(!isset($resultSIP[0]['secret']) || strtoupper(MD5($resultSIP[0]['secret'])) != $password){
 					exit;
 				}
+				$password = $resultSIP[0]['secret'];
 			}
-			$password = $result[0]['password'];
+			else
+				$password = $result[0]['password'];
 		}
 
 
@@ -166,19 +168,6 @@ class AuthenticationController extends BaseController
 
 		Yii::app()->session['userCount']  	  = $result[0]['config_value'];
 
-
-		$sql   = "SELECT m.id, action, show_menu, text, module, icon_cls, m.id_module, gm.createShortCut, 
-								gm.createQuickStart FROM pkg_group_module gm 
-								INNER JOIN pkg_module m ON gm.id_module = m.id 
-								WHERE id_group = :id_group";	
-		$command = Yii::app()->db->createCommand($sql);
-		$command->bindValue(":id_group", $user['id_group'], PDO::PARAM_STR);
-		$result = $command->queryAll();
-		Yii::app()->session['action']        = $this->getActions($result);
-		Yii::app()->session['menu'] 		 = $this->getMenu($result);
-
-		
-
 		if ($user['googleAuthenticator_enable'] > 0) {				
 
 			require_once ('lib/GoogleAuthenticator/GoogleAuthenticator.php');
@@ -214,7 +203,11 @@ class AuthenticationController extends BaseController
 		}
 
 		
-
+		$sql = "SELECT id_group FROM pkg_group_user_group WHERE id_group_user = :id_group";
+        	$command = Yii::app()->db->createCommand($sql);
+        	$command->bindValue(":id_group", Yii::app()->getSession()->get('id_group'), PDO::PARAM_STR);
+        	$resultGroupAllowed = $command->queryAll();
+        	Yii::app()->session['adminLimitUsers'] = count($resultGroupAllowed);
 
 		if (isset($_REQUEST['remote'])) {
 			header("Location: ../..");
@@ -228,6 +221,39 @@ class AuthenticationController extends BaseController
 
 	}
 
+	private function mountMenu()
+	{
+		if (Yii::app()->session['isClient']) {			
+
+			$sql ="(SELECT m.id, action, show_menu, text, module, icon_cls, m.id_module, gm.createShortCut, gm.createQuickStart
+					FROM pkg_group_module gm 
+					INNER JOIN pkg_module m ON gm.id_module = m.id
+					WHERE id_group = :id_group)
+				UNION 
+					(SELECT m.id, action, show_menu, text, module, icon_cls, m.id_module, gm.createShortCut, gm.createQuickStart 
+					FROM pkg_services_module gm 
+					INNER JOIN pkg_module m ON gm.id_module = m.id 
+					WHERE gm.id_services IN (SELECT id_services FROM pkg_services_use WHERE id_user = :id_user AND status = 1)) 
+				ORDER BY id, LENGTH(ACTION) DESC, show_menu DESC";
+			$command = Yii::app()->db->createCommand($sql);
+			$command->bindValue(":id_group", Yii::app()->session['id_group'] , PDO::PARAM_INT);
+			$command->bindValue(":id_user", Yii::app()->session['id_user'], PDO::PARAM_INT);
+			$result = $command->queryAll();
+			//remove duplicate on permissions
+			$result = Util::unique_multidim_array($result,'id');
+		}else{
+			$sql   = "SELECT m.id, action, show_menu, text, module, icon_cls, m.id_module, gm.createShortCut, 
+								gm.createQuickStart FROM pkg_group_module gm 
+								INNER JOIN pkg_module m ON gm.id_module = m.id 
+								WHERE id_group = :id_group";
+			$command = Yii::app()->db->createCommand($sql);
+			$command->bindValue(":id_group", Yii::app()->session['id_group'], PDO::PARAM_STR);
+			$result = $command->queryAll();
+		}		
+
+		Yii::app()->session['action']        = $this->getActions($result);
+		Yii::app()->session['menu'] 		 = $this->getMenu($result);
+	}
 	private function getActions($modules) {
 		$actions = array();
 
@@ -251,7 +277,6 @@ class AuthenticationController extends BaseController
 
 			if(empty($value['id_module'])) {
 				array_push($menu, array(
-					'teste' => 'teste',
 					'text' => preg_replace("/ Module/", "", $value['text']),
 					'iconCls' => $value['icon_cls'],
 					'rows' => $this->getSubMenu($modules, $value['id'])
@@ -332,6 +357,7 @@ class AuthenticationController extends BaseController
 
 	public function actionCheck() {
 		if(Yii::app()->session['logged']) {
+			$this->mountMenu();
 			$id_user       = Yii::app()->session['id_user'];
 			$id_agent      = Yii::app()->session['id_agent'];
 			$nameUser      = Yii::app()->session['name_user'];
@@ -359,7 +385,7 @@ class AuthenticationController extends BaseController
 			$checkGoogleAuthenticator = Yii::app()->session['checkGoogleAuthenticator'];
 			$googleAuthenticatorKey = Yii::app()->session['googleAuthenticatorKey'];
 			$newGoogleAuthenticator = Yii::app()->session['newGoogleAuthenticator'];
-			$showGoogleCode = Yii::app()->session['showGoogleCode'];
+			$showGoogleCode = Yii::app()->session['showGoogleCode'];		
 		
 		}
 		else {

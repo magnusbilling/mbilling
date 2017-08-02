@@ -73,7 +73,7 @@ class MasiveCall3Command extends CConsoleCommand
 			$nbpage = $campaign['frequency'];
 
 			$sql ="SELECT pkg_phonenumber.id as pkg_phonenumber_id, pkg_phonenumber.number, pkg_campaign.id as pkg_campaign_id, pkg_campaign.forward_number,
-			pkg_user.id , pkg_user.id_plan, pkg_user.username, pkg_campaign.type, pkg_campaign.description, pkg_phonenumber.name, try, pkg_user.credit, restrict_phone
+			pkg_user.id , pkg_user.id_plan, pkg_campaign.id_plan AS campaign_id_plan, pkg_user.username, pkg_campaign.type, pkg_campaign.description, pkg_phonenumber.name, try, pkg_user.credit, restrict_phone
 			FROM pkg_phonenumber , pkg_phonebook , pkg_campaign_phonebook, pkg_campaign, pkg_user 
 			WHERE pkg_phonenumber.id_phonebook = pkg_phonebook.id AND pkg_campaign_phonebook.id_phonebook = pkg_phonebook.id 
 			AND pkg_campaign_phonebook.id_campaign = pkg_campaign.id AND pkg_campaign.id_user = pkg_user.id AND pkg_campaign.status = 1 
@@ -101,6 +101,8 @@ class MasiveCall3Command extends CConsoleCommand
 				$name_number = $phone['name'];
 				$destination = $phone['number'];
 
+				if ($phone['campaign_id_plan'] > 0) 
+					$phone['id_plan'] = $phone['campaign_id_plan'];
 
 				if($phone['restrict_phone'] == 1){
 					$sql = "SELECT * FROM  pkg_campaign_restrict_phone WHERE number = '".$phone['number']."'";

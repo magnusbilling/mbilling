@@ -23,15 +23,9 @@
 class AtaController extends BaseController
 {
 
-
-	public function init()
-	{
-		$config = LoadConfig::getConfig();
-		parent::init();
-	}
-
 	public function actionIndex()
 	{
+		$config = LoadConfig::getConfig();
 		$mac          = isset($_GET['mac']) ? $_GET['mac'] : Null;
 		$date         = date("Y-m-d H:i:s");
 		$mac          = strtoupper(preg_replace("/:/", "", $mac));

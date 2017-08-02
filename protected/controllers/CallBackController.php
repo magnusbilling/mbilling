@@ -22,10 +22,15 @@
 
 class CallBackController extends Controller
 {
-	public $attributeOrder        = 't.id';
-	public $fieldsInvisibleClient = array(
-		'variable'
-		);
+	public $attributeOrder        = 't.id DESC';
+	public $extraValues           = array('idUser' => 'username','idDid'=>'did');
+	public $fieldsFkReport = array(
+		'id_user' => array(
+			'table' => 'pkg_user',
+			'pk' => 'id',
+			'fieldReport' => 'username'
+		)
+	);
 
 	public function init()
 	{
@@ -33,35 +38,6 @@ class CallBackController extends Controller
 		$this->abstractModel = CallBack::model();
 		$this->titleReport   = Yii::t('yii','CallBack');
 		parent::init();
-	}
-
-
-	public function getAttributesModels($models, $itemsExtras = array())
-	{
-		$attributes = false;
-		foreach ($models as $key => $item)
-		{
-			$attributes[$key] = $item->attributes;
-
-			if(Yii::app()->getSession()->get('isClient'))//retira no nome do tronco para clientes
-			{
-				$channel = explode("/",$attributes[$key]['channel']);
-				unset($attributes[$key]['channel']);
-				$attributes[$key]['channel'] = isset($channel[2]) ? $channel[2] : $channel[1];
-			}
-
-
-			foreach($itemsExtras as $relation => $fields)
-			{
-				$arrFields = explode(',', $fields);
-				foreach($arrFields as $field)
-				{
-					$attributes[$key][$relation . $field] = $item->$relation->$field; 
-				}
-			}
-		}
-
-		return $attributes;
 	}
 
 }

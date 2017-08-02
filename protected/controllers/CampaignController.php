@@ -26,7 +26,7 @@ class CampaignController extends Controller
 	public $nameModelRelated   = 'CampaignPhonebook';
 	public $nameFkRelated      = 'id_campaign';
 	public $nameOtherFkRelated = 'id_phonebook';
-	public $extraValues        = array('idUser' => 'username');
+	public $extraValues        = array('idUser' => 'username', 'idPlan' =>'name');
 
 
 	public $filterByUser        = true;
@@ -274,7 +274,6 @@ class CampaignController extends Controller
 
 	public function actionQuick()
 	{
-
 		$creationdate = $_POST['startingdate'] . ' '.$_POST['startingtime'];
 
 		$name = Yii::app()->session['username'] . '_'.$creationdate;
@@ -292,7 +291,7 @@ class CampaignController extends Controller
 		$command->bindValue(":id_user", Yii::app()->session['id_user'], PDO::PARAM_INT);
 		$command->bindValue(":tipo", $tipo, PDO::PARAM_STR);
 		$command->bindValue(":msj", $msj, PDO::PARAM_STR);
-		$command->bindValue(":startingtime", $startingtime, PDO::PARAM_STR);
+		$command->bindValue(":startingtime", $_POST['startingtime'], PDO::PARAM_STR);
 		$command->execute();
 
       	$id_campaign = Yii::app()->db->getLastInsertID();

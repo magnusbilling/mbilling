@@ -96,7 +96,7 @@ class Diddestination extends Model
 				exit;
 			}
 
-			if ($did->reserved == 0)
+			if (isset($did->reserved) && $did->reserved == 0)
 			{
 				$priceDid = $did->connection_charge + $did->fixrate;
 

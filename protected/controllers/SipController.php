@@ -17,208 +17,207 @@
 
 class SipController extends Controller
 {
-	public $attributeOrder     = 'regseconds DESC';
-	public $extraValues        = array( 'idUser' => 'username' );
+    public $attributeOrder = 'regseconds DESC';
+    public $extraValues    = array('idUser' => 'username');
 
-	public $filterByUser        = true;
-	public $defaultFilterByUser = 'b.id_user';
-	public $join                = 'JOIN pkg_user b ON t.id_user = b.id';
+    public $filterByUser        = true;
+    public $defaultFilterByUser = 'b.id_user';
+    public $join                = 'JOIN pkg_user b ON t.id_user = b.id';
 
-	private $host = 'localhost';
-    private $user = 'magnus';
-    private $password = 'magnussolution';
-	private $sipShowPeers = array();
+    private $host         = 'localhost';
+    private $user         = 'magnus';
+    private $password     = 'magnussolution';
+    private $sipShowPeers = array();
 
-	public $fieldsFkReport = array(
-		'id_user' => array(
-			'table' => 'pkg_user',
-			'pk' => 'id',
-			'fieldReport' => 'username'
-		)
-	);
+    public $fieldsFkReport = array(
+        'id_user' => array(
+            'table'       => 'pkg_user',
+            'pk'          => 'id',
+            'fieldReport' => 'username',
+        ),
+    );
 
-	public function init() {
-		$this->instanceModel = new Sip;
-		$this->abstractModel = Sip::model();
-		parent::init();
-	}
+    public function init()
+    {
+        $this->instanceModel = new Sip;
+        $this->abstractModel = Sip::model();
+        parent::init();
+    }
 
-	public function actionRead()
-	{
-		$sipShowPeers = new AGI_ParseData(); 
-		$this->sipShowPeers =$sipShowPeers->SipShowPeers();
-		parent::actionRead();
-	}
+    public function actionRead($asJson = true)
+    {
+        $sipShowPeers       = new AGI_ParseData();
+        $this->sipShowPeers = $sipShowPeers->SipShowPeers();
+        parent::actionRead($asJson = true);
+    }
 
+    public function actionRealtime()
+    {
+        Yii::log(print_r($_REQUEST, true), 'info');
 
-	public function actionRealtime()
-	{
-		Yii::log(print_r($_REQUEST,true),'info');
+        if (isset($_GET['update'])) {
 
-		if (isset($_GET['update']) ) {
+            $values = '';
+            foreach ($_POST as $key => $value) {
+                $values .= $key . "='" . $value . "',";
+            }
+            $sql = "UPDATE pkg_sip SET " . substr($values, 0, -1) . " WHERE name = :name";
+            try {
+                $command = Yii::app()->db->createCommand($sql);
+                $command->bindValue(":name", $_GET['name'], PDO::PARAM_STR);
+                $command->execute();
+            } catch (Exception $e) {
 
-			$values = '';
-			foreach ($_POST as $key => $value) {
-				$values .= $key ."='".$value."',";
-			}
-			$sql = "UPDATE pkg_sip SET ".substr($values,0,-1)." WHERE name = :name";
-			try {
-				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(":name", $_GET['name'], PDO::PARAM_STR);
-				$command->execute();
-			} catch (Exception $e) {
-				
-			}
-			 
-		}elseif (isset($_GET['single']) AND isset($_POST['host'])){
-		
-			$sql = "SELECT  type, regexten, callerid, dtmfmode, insecure,  context, secret, defaultuser, 
-							qualify, disallow, directmedia, cid_number, allowtransfer, host, 
-							accountcode, qualify, allow, nat, regseconds, ipaddr, fullcontact, useragent 
-							FROM pkg_sip WHERE name = :name AND host = :host";
-			$command = Yii::app()->db->createCommand($sql);
-			$command->bindValue(":name", $_GET['name'], PDO::PARAM_STR);
-			$command->bindValue(":host", $_POST['host'], PDO::PARAM_STR);
-			$resultSip=  $command->queryAll();
-	
-			if (count($resultSip) == 0) {
-				Yii::log("CONTA SIP NAO ENCONTRDA",'error');
-				$sql = "SELECT  type ,  dtmfmode, insecure,  context, secret, user AS defaultuser, 
-								user AS fromuser,  qualify, disallow, directmedia, host, qualify, 
-								allow, nat FROM pkg_trunk WHERE trunkcode = :trunkcode";
-				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(":trunkcode", $_POST['name'], PDO::PARAM_STR);
-				$resultSip=  $command->queryAll();
+            }
 
-				if (count($resultSip) == 0) {
-					$sql = "SELECT  secret, user  FROM pkg_trunk WHERE host = :host";
-					$command = Yii::app()->db->createCommand($sql);
-					$command->bindValue(":host", $_POST['name'], PDO::PARAM_STR);
-					$resultSip=  $command->queryAll();
+        } elseif (isset($_GET['single']) and isset($_POST['host'])) {
 
-					if (count($resultSip) == 0) {
-						return;
-					}else{
-						echo "register=>".$resultSip[0]['user'].':'.$resultSip[0]['secret'].'@'.$_POST['name'];
-						exit;
-					}
+            $sql = "SELECT  type, regexten, callerid, dtmfmode, insecure,  context, secret, defaultuser,
+                            qualify, disallow, directmedia, cid_number, allowtransfer, host,
+                            accountcode, qualify, allow, nat, regseconds, ipaddr, fullcontact, useragent
+                            FROM pkg_sip WHERE name = :name AND host = :host";
+            $command = Yii::app()->db->createCommand($sql);
+            $command->bindValue(":name", $_GET['name'], PDO::PARAM_STR);
+            $command->bindValue(":host", $_POST['host'], PDO::PARAM_STR);
+            $resultSip = $command->queryAll();
 
+            if (count($resultSip) == 0) {
+                Yii::log("CONTA SIP NAO ENCONTRDA", 'error');
+                $sql = "SELECT  type ,  dtmfmode, insecure,  context, secret, user AS defaultuser,
+                                user AS fromuser,  qualify, disallow, directmedia, host, qualify,
+                                allow, nat FROM pkg_trunk WHERE trunkcode = :trunkcode";
+                $command = Yii::app()->db->createCommand($sql);
+                $command->bindValue(":trunkcode", $_POST['name'], PDO::PARAM_STR);
+                $resultSip = $command->queryAll();
 
-				}
-			}
-			$line = "";
-				
-			$i=0;
-			foreach ($resultSip[0] as $key => $value) {
-				//Yii::log(print_r($key,true),'error');
-				if (strlen($value) > 0)
-					$line .= $key."=".$value."&";
+                if (count($resultSip) == 0) {
+                    $sql     = "SELECT  secret, user  FROM pkg_trunk WHERE host = :host";
+                    $command = Yii::app()->db->createCommand($sql);
+                    $command->bindValue(":host", $_POST['name'], PDO::PARAM_STR);
+                    $resultSip = $command->queryAll();
 
-				$i++;
-			}
-			Yii::log($line,'error');
-			echo substr($line,0, -1);
-		}
+                    if (count($resultSip) == 0) {
+                        return;
+                    } else {
+                        echo "register=>" . $resultSip[0]['user'] . ':' . $resultSip[0]['secret'] . '@' . $_POST['name'];
+                        exit;
+                    }
 
-	}
+                }
+            }
+            $line = "";
 
-	public function extraFilter( $filter ) {
-		$filter = isset( $this->filter ) ? $filter.$this->filter : $filter;
+            $i = 0;
+            foreach ($resultSip[0] as $key => $value) {
+                //Yii::log(print_r($key,true),'error');
+                if (strlen($value) > 0) {
+                    $line .= $key . "=" . $value . "&";
+                }
 
-		$filter = $filter . ' AND ' .$this->defaultFilter;
-		$filter = $this->filterReplace( $filter );
+                $i++;
+            }
+            Yii::log($line, 'error');
+            echo substr($line, 0, -1);
+        }
 
-		if ( Yii::app()->getSession()->get( 'user_type' )  > 1 && $this->filterByUser ) {
-			$filter .= ' AND ('. $this->defaultFilterByUser . ' = '.Yii::app()->getSession()->get( 'id_user' );
-			$filter .= ' OR t.id_user = '.Yii::app()->getSession()->get( 'id_user' ).')';
-		}
-		return $filter;
-	}
+    }
 
-	public function actionDestroy() {
+    public function extraFilter($filter)
+    {
+        $filter = isset($this->filter) ? $filter . $this->filter : $filter;
 
-		$sql = "SELECT * FROM pkg_servers WHERE type = 'sipproxy' AND status = 1";
-		$resultOpensips = Yii::app()->db->createCommand( $sql )->queryAll();
+        $filter = $filter . ' AND ' . $this->defaultFilter;
+        $filter = $this->filterReplace($filter);
 
-		foreach ( $resultOpensips as $key => $server ) {
+        if (Yii::app()->getSession()->get('user_type') > 1 && $this->filterByUser) {
+            $filter .= ' AND (' . $this->defaultFilterByUser . ' = ' . Yii::app()->getSession()->get('id_user');
+            $filter .= ' OR t.id_user = ' . Yii::app()->getSession()->get('id_user') . ')';
+        }
+        return $filter;
+    }
 
-			$hostname = $server['host'];
-			$dbname = 'opensips';
-			$table = 'subscriber';
-			$user = $server['username'];
-			$password = $server['password'];
-			$port = $server['port'];
+    public function actionDestroy()
+    {
 
-			$dsn='mysql:host='.$hostname.';dbname='.$dbname;
+        $sql            = "SELECT * FROM pkg_servers WHERE type = 'sipproxy' AND status = 1";
+        $resultOpensips = Yii::app()->db->createCommand($sql)->queryAll();
 
-			$con=new CDbConnection( $dsn, $user, $password );
-			$con->active=true;
+        foreach ($resultOpensips as $key => $server) {
 
+            $hostname = $server['host'];
+            $dbname   = 'opensips';
+            $table    = 'subscriber';
+            $user     = $server['username'];
+            $password = $server['password'];
+            $port     = $server['port'];
 
-			$values = $this->getAttributesRequest();
+            $dsn = 'mysql:host=' . $hostname . ';dbname=' . $dbname;
 
-			foreach ( $values as $key => $id ) {
-				$sql = "SELECT name FROM pkg_sip WHERE id = :id";
-				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(":id", $id, PDO::PARAM_INT);
-				$resultSip=  $command->queryAll();
+            $con         = new CDbConnection($dsn, $user, $password);
+            $con->active = true;
 
-				 
-				$sql = "DELETE FROM $dbname.$table WHERE username = '".$resultSip[0]['name']."'";
-				$con->createCommand( $sql )->execute();
-			}
+            $values = $this->getAttributesRequest();
 
-		}
+            foreach ($values as $key => $id) {
+                $sql     = "SELECT name FROM pkg_sip WHERE id = :id";
+                $command = Yii::app()->db->createCommand($sql);
+                $command->bindValue(":id", $id, PDO::PARAM_INT);
+                $resultSip = $command->queryAll();
 
+                $sql = "DELETE FROM $dbname.$table WHERE username = '" . $resultSip[0]['name'] . "'";
+                $con->createCommand($sql)->execute();
+            }
 
-		parent::actionDestroy();
-	}
+        }
 
-	public function getAttributesModels( $models, $itemsExtras = array() ) {
-		$attributes = false;
-		$configFile = '/etc/kamailio/kamailio.cfg';
+        parent::actionDestroy();
+    }
 
-		foreach ( $models as $key => $item ) {
-			$attributes[$key] = $item->attributes;
+    public function getAttributesModels($models, $itemsExtras = array())
+    {
+        $attributes = false;
+        $configFile = '/etc/kamailio/kamailio.cfg';
 
+        foreach ($models as $key => $item) {
+            $attributes[$key] = $item->attributes;
 
-			$attributes[$key]['lineStatus'] = 'unregistered';
-			foreach ($this->sipShowPeers as $value) {
-				if ($value['Name/username'] == $attributes[$key]['name'].'/'.$attributes[$key]['name']) {
-					$attributes[$key]['lineStatus'] = $value['Status'];
-				}
-			}		
-		
-			if ( isset( $_SESSION['isClient'] ) && $_SESSION['isClient'] ) {
-				foreach ( $this->fieldsInvisibleClient as $field ) {
-					unset( $attributes[$key][$field] );
-				}
-			}
+            $attributes[$key]['lineStatus'] = 'unregistered';
+            foreach ($this->sipShowPeers as $value) {
+                if ($value['Name/username'] == $attributes[$key]['name'] . '/' . $attributes[$key]['name']) {
+                    $attributes[$key]['lineStatus'] = $value['Status'];
+                }
+            }
 
-			if ( isset( $_SESSION['isAgent'] ) && $_SESSION['isAgent'] ) {
-				foreach ( $this->fieldsInvisibleAgent as $field ) {
-					unset( $attributes[$key][$field] );
-				}
-			}
+            if (isset($_SESSION['isClient']) && $_SESSION['isClient']) {
+                foreach ($this->fieldsInvisibleClient as $field) {
+                    unset($attributes[$key][$field]);
+                }
+            }
 
-			foreach ( $itemsExtras as $relation => $fields ) {
-				$arrFields = explode( ',', $fields );
-				foreach ( $arrFields as $field ) {
-					$attributes[$key][$relation . $field] = $item->$relation->$field;
-					if ( $_SESSION['isClient'] ) {
-						foreach ( $this->fieldsInvisibleClient as $field ) {
-							unset( $attributes[$key][$field] );
-						}
-					}
+            if (isset($_SESSION['isAgent']) && $_SESSION['isAgent']) {
+                foreach ($this->fieldsInvisibleAgent as $field) {
+                    unset($attributes[$key][$field]);
+                }
+            }
 
-					if ( $_SESSION['isAgent'] ) {
-						foreach ( $this->fieldsInvisibleAgent as $field ) {
-							unset( $attributes[$key][$field] );
-						}
-					}
-				}
-			}
-		}
-		return $attributes;
-	}
+            foreach ($itemsExtras as $relation => $fields) {
+                $arrFields = explode(',', $fields);
+                foreach ($arrFields as $field) {
+                    $attributes[$key][$relation . $field] = $item->$relation->$field;
+                    if ($_SESSION['isClient']) {
+                        foreach ($this->fieldsInvisibleClient as $field) {
+                            unset($attributes[$key][$field]);
+                        }
+                    }
+
+                    if ($_SESSION['isAgent']) {
+                        foreach ($this->fieldsInvisibleAgent as $field) {
+                            unset($attributes[$key][$field]);
+                        }
+                    }
+                }
+            }
+        }
+        return $attributes;
+    }
 }

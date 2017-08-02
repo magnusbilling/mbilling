@@ -23,27 +23,26 @@
 
 class TemplateMailController extends Controller
 {
-	public $attributeOrder = 't.id';
+    public $attributeOrder = 't.id';
 
+    public function init()
+    {
+        $config              = LoadConfig::getConfig();
+        $this->instanceModel = new TemplateMail;
+        $this->abstractModel = TemplateMail::model();
+        $this->titleReport   = Yii::t('yii', 'Mails');
 
-	public function init()
-	{
-		$config = LoadConfig::getConfig();
-		$this->instanceModel = new TemplateMail;
-		$this->abstractModel = TemplateMail::model();
-		$this->titleReport   = Yii::t('yii','Mails');
+        parent::init();
 
-		
-		parent::init();
+    }
 
-	}
+    public function actionRead($asJson = true)
+    {
+        if (Yii::app()->getSession()->get('isAdmin')) {
+            $this->filter = ' AND id_user = 1';
+        }
 
-	public function actionRead()
-	{
-		if(Yii::app()->getSession()->get('isAdmin'))
-			$this->filter =  ' AND id_user = 1';
-		
-		parent::actionRead();
-	}
+        parent::actionRead($asJson = true);
+    }
 
 }

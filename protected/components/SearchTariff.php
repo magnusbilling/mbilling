@@ -31,22 +31,25 @@ class SearchTariff {
         $agi->verbose( $sql, 25 );
         $resultPrefixLen = Yii::app()->db->createCommand( $sql )->queryAll();
 
-        if ( !is_array( $resultPrefixLen ) || count( $resultPrefixLen ) == 0 )
-            return 0;
-        
-        $max_len_prefix = $resultPrefixLen[0]['prefix'];
-        
-        $prefixclause = '(';
-        while ( $max_len_prefix >= 1 ) {
-            $prefixclause .= "prefix='" . substr( $destination, 0, $max_len_prefix ) . "' OR ";
-            $max_len_prefix--;
-        }
-        $prefixclause = substr( $prefixclause, 0, -3 ).")";
+        if ( is_array( $resultPrefixLen ) && count( $resultPrefixLen ) > 0 ){
+            $max_len_prefix = $resultPrefixLen[0]['prefix'];
+            $prefixclause = '((';
+            while ( $max_len_prefix >= 1 ) {
+                $prefixclause .= "prefix='" . substr( $destination, 0, $max_len_prefix ) . "' OR ";
+                $max_len_prefix--;
+            }
+            $prefixclause = substr( $prefixclause, 0, -3 ).")";
 
-        $prefixclause .= " OR (prefix LIKE '&_%' ESCAPE '&' AND '".$destination."'
-                    REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', prefix, '$'), 
-                    'X', '[0-9]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
-        $agi->verbose( $prefixclause, 20 );
+            $prefixclause .= " OR (prefix LIKE '&_%' ESCAPE '&' AND '".$destination."'
+                        REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', prefix, '$'), 
+                        'X', '[0-9]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', '')))";
+            $agi->verbose( $prefixclause, 20 );
+        }else{
+            $max_len_prefix = 6;
+            $prefixclause .= "  (prefix LIKE '&_%' ESCAPE '&' AND '".$destination."'
+                        REGEXP REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(CONCAT('^', prefix, '$'), 
+                        'X', '[0-9]'), 'Z', '[1-9]'), 'N', '[2-9]'), '.', '.+'), '_', ''))";
+        }
 
         $sql = "SELECT " .
             "lcrtype, pkg_plan.id AS id_plan, pkg_prefix.prefix AS dialprefix, " .
@@ -65,8 +68,8 @@ class SearchTariff {
             "LEFT JOIN pkg_trunk AS pkg_trunk ON pkg_trunk.id = pkg_rate.id_trunk " .
             "LEFT JOIN pkg_prefix ON pkg_rate.id_prefix = pkg_prefix.id " .
             "LEFT JOIN pkg_provider ON pkg_trunk.id_provider = pkg_provider.id " .
-            "WHERE pkg_plan.id=$id_plan AND pkg_rate.status = 1 AND ($prefixclause) " .
-            "ORDER BY pkg_prefix.prefix DESC";
+            "WHERE pkg_plan.id=$id_plan AND pkg_rate.status = 1 AND $prefixclause " .
+            "ORDER BY LENGTH( prefix ) DESC ";
         $agi->verbose( $sql, 25 );
         $result = Yii::app()->db->createCommand( $sql )->queryAll();
 

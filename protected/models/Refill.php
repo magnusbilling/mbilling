@@ -132,6 +132,8 @@ class Refill extends Model
 			$mail->replaceInEmail(Mail::$ITEM_AMOUNT_KEY, $this->credit);
 			$mail->replaceInEmail(Mail::$DESCRIPTION, $this->description);
 			$mail->send();
+
+			ServicesProcess::checkIfServiceToPayAfterRefill($this->id_user);
 			
 		}	
 		return parent::afterSave();

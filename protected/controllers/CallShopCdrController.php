@@ -57,6 +57,18 @@ class CallShopCdrController extends Controller
 		parent::actionCsv();
 	}
 
+
+	public function applyFilterToLimitedAdmin($filter)
+	{
+		if (Yii::app()->session['user_type'] == 1 && Yii::app()->session['adminLimitUsers'] == true){
+			$filter .= " AND c.id_group IN 
+				(SELECT id_group FROM pkg_group_user_group 
+				WHERE id_group_user = ".Yii::app()->session['id_group']." )";
+		}
+		return $filter;
+	}
+
+
 	public function actionReport()
 	{
 

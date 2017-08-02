@@ -25,9 +25,6 @@ class SipurasController extends Controller
 	public $attributeOrder     = 'fultmov DESC';
 	public $extraValues        = array('idUser' => 'username');
 
-	public $filterByUser        = true;
-    	public $defaultFilterByUser = 'b.id_user';
-    	public $join                = 'JOIN pkg_user b ON t.id_user = b.id';
     	
 	public function init()
 	{

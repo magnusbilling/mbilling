@@ -22,38 +22,43 @@
 
 class PlanController extends Controller
 {
-	public $attributeOrder     = 'id';
-	public $extraValues        = array('idUser' => 'username');
-	
+    public $attributeOrder = 'id';
+    public $extraValues    = array('idUser' => 'username');
 
-	public function init()
-	{
-		$this->instanceModel        = new Plan;
-		$this->abstractModel        = Plan::model();
-		$this->titleReport          = Yii::t('yii','Plan');
-		parent::init();
-	}
+    public $nameModelRelated   = 'ServicesPlan';
+    public $nameFkRelated      = 'id_plan';
+    public $nameOtherFkRelated = 'id_services';
 
-	public function actionDestroy()
-	{
-		# recebe os parametros da exclusao
-		$values = $this->getAttributesRequest();
+    public function init()
+    {
+        $this->instanceModel        = new Plan;
+        $this->abstractModel        = Plan::model();
+        $this->titleReport          = Yii::t('yii', 'Plan');
+        $this->abstractModelRelated = ServicesPlan::model();
 
-		if(Yii::app()->getSession()->get('isAgent'))	{
-			$sql = "DELETE FROM pkg_rate_agent WHERE id_plan = '".$values['id']."'";
-			Yii::app()->db->createCommand($sql)->execute();
-		}		
-			
+        parent::init();
+    }
 
-		parent::actionDestroy();
-	}
+    public function actionDestroy()
+    {
+        # recebe os parametros da exclusao
+        $values = $this->getAttributesRequest();
 
-	public function actionRead()
-	{
-		if(Yii::app()->getSession()->get('isAdmin'))
-			$this->filter =  ' AND id_user = 1';
-		
-		parent::actionRead();
-	}
+        if (Yii::app()->getSession()->get('isAgent')) {
+            $sql = "DELETE FROM pkg_rate_agent WHERE id_plan = '" . $values['id'] . "'";
+            Yii::app()->db->createCommand($sql)->execute();
+        }
+
+        parent::actionDestroy();
+    }
+
+    public function actionRead($asJson = true)
+    {
+        if (Yii::app()->getSession()->get('isAdmin')) {
+            $this->filter = ' AND id_user = 1';
+        }
+
+        parent::actionRead($asJson = true);
+    }
 
 }

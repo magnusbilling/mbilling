@@ -58,7 +58,7 @@ class Sip extends Model
 	public function rules() {
 		return array(
 			array( 'id_user', 'required' ),
-			array( 'id_user, calllimit', 'numerical', 'integerOnly'=>true ),
+			array( 'id_user, calllimit, ringfalse, record_call', 'numerical', 'integerOnly'=>true ),
 			array( 'name, callerid, context, fromuser, fromdomain, md5secret, secret, fullcontact', 'length', 'max'=>80 ),
 			array( 'regexten, insecure, regserver, vmexten, callingpres, mohsuggest, allowtransfer', 'length', 'max'=>20 ),
 			array( 'amaflags, dtmfmode, qualify', 'length', 'max'=>7 ),
@@ -106,8 +106,22 @@ class Sip extends Model
 
 		
 
-		$sql = "SELECT username FROM pkg_user WHERE id = ".$this->id_user;
+		$sql = "SELECT username, sipaccountlimit FROM pkg_user WHERE id = ".$this->id_user;
 		$CardResult = Yii::app()->db->createCommand( $sql )->queryAll();
+
+
+		$sql = "SELECT count(*) as total FROM pkg_sip WHERE id_user = ". $this->id_user;
+		$countSipResult = Yii::app()->db->createCommand( $sql )->queryAll();
+
+		if ($this->getIsNewRecord() && !Yii::app()->session['isAdmin'] && $CardResult[0]['sipaccountlimit'] > 0 && $countSipResult[0]['total'] >= $CardResult[0]['sipaccountlimit']) {
+			echo json_encode(array(
+				'success' => false,
+				'rows' => array(),
+				'errors' => 'Limit sip acount exceeded'
+			));
+			exit;
+		}
+
 		$this->accountcode = $CardResult[0]['username'];
 		$this->name = $this->defaultuser == '' ?  $this->accountcode : $this->defaultuser;
 
@@ -171,14 +185,20 @@ class Sip extends Model
 
 	public function generateFileText() {
 
-		if ( $_SERVER['HTTP_HOST'] == 'localhost' || preg_match( "/magnusbilling.com/", $_SERVER['HTTP_HOST'] ) ) {
+		if (  preg_match( "/magnusbilling.com|localhost/", $_SERVER['HTTP_HOST'] ) ) {
 			return;
 		}
 
 		$select = 'id, accountcode, name, defaultuser, secret, regexten, amaflags, callerid, language, cid_number, disallow, allow, directmedia, context, dtmfmode, insecure, nat, qualify, type, host, calllimit '; // add
+
+		if ($_SERVER['HTTP_HOST'] == 'localhost')
+			$filter = '';
+		else
+			$filter = "host != 'dynamic' OR  calllimit > 0";
+		
 		$list_friend = Sip::model()->findAll( array(
 				'select'=>$select,
-				'condition' => "host != 'dynamic' OR  calllimit > 0"
+				'condition' => $filter
 			) );
 
 		$buddyfile = '/etc/asterisk/sip_magnus_user.conf';

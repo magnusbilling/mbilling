@@ -10,6 +10,13 @@
 					));?>
 
 <br/>
+<style type="text/css">
+
+form { 
+	margin: 0 auto; 
+}
+
+</style>
 <?php $plans = CHtml::listData($plan,'id','name'); ?>
 
 <?php if(count($plan) > 1): ?>
@@ -21,17 +28,25 @@
 </div>
 <br>
 <?php elseif(count($plan) == 1): ?>
-	<?php echo $form->hiddenField($signup,'id_plan',array('value'=> $plan[0]['id'])); ?>
+	<?php echo $form->hiddenField($signup,'id_plan',array('value'=> $plan[0]->id)); ?>
 	
 <?php elseif(count($plan) == 0): ?>
 	<?php exit(Yii::t('yii','No have a active Plan')) ?>
 <?php endif; ?>
 
-<?php echo $form->hiddenField($signup,'ini_credit',array('value'=> $plan[0]['ini_credit'])); ?>
+<?php echo $form->hiddenField($signup,'ini_credit',array('value'=> $plan[0]->ini_credit)); ?>
 
-<?php echo $form->hiddenField($signup,'id_user',array('value'=> $plan[0]['id_user'])); ?>
+<?php echo $form->hiddenField($signup,'id_user',array('value'=> $plan[0]->id_user)); ?>
 
 
+<?php if($autoUser == 0): ?>
+<div class="field">
+	<?php echo $form->labelEx($signup,Yii::t('yii','username'))?>
+	<?php echo $form->textField($signup,'username', array('class' => 'input' ))?>
+	<?php echo $form->error($signup,'username')?>
+	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','username') ?></p>
+</div>
+<?php endif; ?>
 <div class="field">
 	<?php echo $form->labelEx($signup,Yii::t('yii','email'))?>
 	<?php echo $form->textField($signup,'email', array('class' => 'input' ))?>
@@ -59,7 +74,12 @@
 	<?php echo $form->hiddenField($signup,'password',array('value'=> $autoPassword)); ?>
 	<?php echo $form->hiddenField($signup,'password2',array('value'=> $autoPassword)); ?>
 <?php endif;?>
-
+<div class="field">
+	<?php echo $form->labelEx($signup,Yii::t('yii','firstname'))?>
+	<?php echo $form->textField($signup,'firstname', array('class' => 'input' ))?>
+	<?php echo $form->error($signup,'firstname')?>
+	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','firstname') ?></p>
+</div>
 
 <div class="field">
 	<?php echo $form->labelEx($signup,Yii::t('yii','lastname'))?>
@@ -69,10 +89,10 @@
 </div>
 
 <div class="field">
-	<?php echo $form->labelEx($signup,Yii::t('yii','firstname'))?>
-	<?php echo $form->textField($signup,'firstname', array('class' => 'input' ))?>
-	<?php echo $form->error($signup,'firstname')?>
-	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','firstname') ?></p>
+	<?php echo $form->labelEx($signup,Yii::t('yii','zipcode'))?>
+	<?php echo $form->numberField($signup,'zipcode', array('class' => 'input' ))?>
+	<?php echo $form->error($signup,'zipcode')?>
+	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','zipcode') ?></p>
 </div>
 <div class="field">
 	<?php echo $form->labelEx($signup,Yii::t('yii','address'))?>
@@ -86,18 +106,26 @@
 	<?php echo $form->error($signup,'city')?>
 	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','city') ?></p>
 </div>
-<div class="field">
-	<?php echo $form->labelEx($signup,Yii::t('yii','state'))?>
-	<?php echo $form->textField($signup,'state', array('class' => 'input' ))?>
-	<?php echo $form->error($signup,'state')?>
-	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','state') ?></p>
-</div>
-<div class="field">
-	<?php echo $form->labelEx($signup,Yii::t('yii','zipcode'))?>
-	<?php echo $form->numberField($signup,'zipcode', array('class' => 'input' ))?>
-	<?php echo $form->error($signup,'zipcode')?>
-	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','zipcode') ?></p>
-</div>
+
+<?php if($language == 'pt_BR'): ?>
+	<div class="field">
+
+		<?php $modelEstados = Estados::model()->findAll();?>
+		<?php $estados = CHtml::listData($modelEstados,'sigla','nome');?>
+		 
+		<?php echo $form->labelEx($signup,Yii::t('yii','state'))?>
+		<div class="styled-select">
+		<?php echo $form->dropDownList($signup,'state', $estados, array('empty'=>'Selecione um estado...')); ?>
+		</div>
+	</div>
+<?php else: ?>
+	<div class="field">
+		<?php echo $form->labelEx($signup,Yii::t('yii','state'))?>
+		<?php echo $form->textField($signup,'state', array('class' => 'input' ))?>
+		<?php echo $form->error($signup,'state')?>
+		<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','state') ?></p>
+	</div>
+<?php endif; ?>
 
 <div class="field">
 	<?php echo $form->labelEx($signup,Yii::t('yii','phone'))?>
@@ -113,10 +141,28 @@
 </div>
 <div class="field">
 	<?php echo $form->labelEx($signup,Yii::t('yii','CPF/CNPJ'))?>
-	<?php echo $form->numberField($signup,'doc', array('class' => 'input' ))?>
+	<?php echo $form->textField($signup,'doc', array('class' => 'input' ))?>
 	<?php echo $form->error($signup,'doc')?>
 	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','CPF/CNPJ') ?></p>
 </div>
+
+<?php if($language == 'pt_BR'): ?>
+<div class="field">
+	<?php echo $form->labelEx($signup,Yii::t('yii','company_name'))?>
+	<?php echo $form->textField($signup,'company_name', array('class' => 'input' ))?>
+	<?php echo $form->error($signup,'company_name')?>
+	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','company_name') ?></p>
+</div>
+<div class="field">
+	<?php echo $form->labelEx($signup,Yii::t('yii','state_number'))?>
+	<?php echo $form->numberField($signup,'state_number', array('class' => 'input' ))?>
+	<?php echo $form->error($signup,'state_number')?>
+	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','state_number') ?></p>
+</div>
+
+
+<?php endif; ?>
+
 <br>
 
 <?php if(CCaptcha::checkRequirements()): ?>
@@ -127,7 +173,19 @@
 		<p class="hint"><?php echo Yii::t('yii','Enter the verifyCode shown') ?></p>
 		<blockquote><blockquote><?php $this->widget('CCaptcha'); ?> </blockquote></blockquote>
 	</div>
+	<br>
  <?php endif; ?>
 
+<div class="field">
+	<?php echo $form->labelEx($signup,Yii::t('yii','I accept the terms'))?>
+	<?php echo $form->checkBox($signup,'accept_terms',  array('checked'=>'')); ?>
+	<?php echo $form->error($signup,'accept_terms')?>
+	<p class="hint"><?php echo Yii::t('yii','Enter your') . ' '. Yii::t('yii','I accept the terms') ?></p>
+</div>
+<br>
+<a href="<?php echo $termsLink ?>" target='_blank'><?php echo Yii::t('yii','Terms')?></a>
+<br>
+
 <?php echo CHtml::submitButton(Yii::t('yii','Save'), array('class' => 'button'));?>
+
 <?php $this->endWidget(); ?>

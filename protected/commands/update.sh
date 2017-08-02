@@ -25,6 +25,7 @@ fi
 rm -rf /var/www/html/mbilling/MBilling*.tar.gz
 cd /var/www/html/mbilling
 wget http://master.dl.sourceforge.net/project/magnusbilling/MBilling-5-current.tar.gz
+cd /var/www/html/mbilling
 rm -rf /var/www/html/mbilling/yii
 tar xzf MBilling-5-current.tar.gz
 rm -rf /var/www/html/mbilling/MBilling*.tar.gz
@@ -46,3 +47,4 @@ chmod 774 /var/www/html/mbilling/resources/ip.blacklist
 chmod -R 655 /var/www/html/mbilling/tmp
 chmod -R 750 /var/www/html/mbilling/resources/sounds
 chmod -R 770 /var/www/html/mbilling/resources/images
+chmod -R 750 /var/www/html/mbilling/assets

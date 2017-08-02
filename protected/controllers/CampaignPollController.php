@@ -43,6 +43,16 @@ class CampaignPollController extends Controller
 		parent::init();
 	}
 
+	public function applyFilterToLimitedAdmin($filter)
+	{
+		if (Yii::app()->session['user_type'] == 1 && Yii::app()->session['adminLimitUsers'] == true){
+			$this->join .= ' JOIN pkg_user b ON pkg_campaign.id_user = b.id';
+			$filter .= " AND b.id_group IN (SELECT id_group FROM pkg_group_user_group 
+						WHERE id_group_user = ".Yii::app()->session['id_group']." )";
+		}
+		return $filter;
+	}
+
 	public function extraFilter ($filter)
 	{
 		$filter = isset($this->filter) ? $filter.$this->filter : $filter;

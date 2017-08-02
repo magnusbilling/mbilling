@@ -22,56 +22,54 @@
 
 class PhoneBookController extends Controller
 {
-	public $attributeOrder        = 't.name ASC';
-	public $extraValues           = array('idUser' => 'username');
-	public $filterByUser        = true;
-    	public $defaultFilterByUser = 'b.id_user';
-    	public $join                = 'JOIN pkg_user b ON t.id_user = b.id';
+    public $attributeOrder      = 't.name ASC';
+    public $extraValues         = array('idUser' => 'username');
+    public $filterByUser        = true;
+    public $defaultFilterByUser = 'b.id_user';
+    public $join                = 'JOIN pkg_user b ON t.id_user = b.id';
 
-    	public $fieldsFkReport = array(
-		'id_user' => array(
-			'table' => 'pkg_user',
-			'pk' => 'id',
-			'fieldReport' => 'username'
-		)
-	);
-	public $fieldsInvisibleClient = array(
-		'id_user',
-		'idCardusername'
-		);
+    public $fieldsFkReport = array(
+        'id_user' => array(
+            'table'       => 'pkg_user',
+            'pk'          => 'id',
+            'fieldReport' => 'username',
+        ),
+    );
+    public $fieldsInvisibleClient = array(
+        'id_user',
+        'idCardusername',
+    );
 
-	public function init()
-	{
-		$this->instanceModel = new PhoneBook;
-		$this->abstractModel = PhoneBook::model();
-		$this->titleReport   = Yii::t('yii','Phone Book');		
-		
-		parent::init();
-	}
+    public function init()
+    {
+        $this->instanceModel = new PhoneBook;
+        $this->abstractModel = PhoneBook::model();
+        $this->titleReport   = Yii::t('yii', 'Phone Book');
 
-	public function extraFilter ($filter)
-	{
-		$filter = isset($this->filter) ? $filter.$this->filter : $filter;
+        parent::init();
+    }
 
-		$filter = $filter . ' AND ' .$this->defaultFilter;
-		$filter = $this->filterReplace($filter);
+    public function extraFilter($filter)
+    {
+        $filter = isset($this->filter) ? $filter . $this->filter : $filter;
 
-		 if(Yii::app()->getSession()->get('user_type')  > 1 && $this->filterByUser)
-        {
-            $filter .= ' AND ('. $this->defaultFilterByUser . ' = '.Yii::app()->getSession()->get('id_user');
-            $filter .= ' OR t.id_user = '.Yii::app()->getSession()->get('id_user').')';
+        $filter = $filter . ' AND ' . $this->defaultFilter;
+        $filter = $this->filterReplace($filter);
+
+        if (Yii::app()->getSession()->get('user_type') > 1 && $this->filterByUser) {
+            $filter .= ' AND (' . $this->defaultFilterByUser . ' = ' . Yii::app()->getSession()->get('id_user');
+            $filter .= ' OR t.id_user = ' . Yii::app()->getSession()->get('id_user') . ')';
         }
 
-		return $filter;
-	}
-	
+        return $filter;
+    }
 
-	public function actionRead()
-	{
-		$filter = isset($_REQUEST['filter']) ? $_REQUEST['filter'] : null;
-		$filter = $this->createCondition(json_decode($filter));
-		$this->filter =  !preg_match("/status/", $filter) ? ' AND status = 1' : '';
-		parent::actionRead();
-	}
+    public function actionRead($asJson = true)
+    {
+        $filter       = isset($_REQUEST['filter']) ? $_REQUEST['filter'] : null;
+        $filter       = $this->createCondition(json_decode($filter));
+        $this->filter = !preg_match("/status/", $filter) ? ' AND status = 1' : '';
+        parent::actionRead($asJson = true);
+    }
 
 }

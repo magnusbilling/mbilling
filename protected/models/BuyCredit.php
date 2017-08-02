@@ -45,5 +45,15 @@
 
 		);
 	}
+	/**
+	 *
+	 *
+	 * @return array regras de relacionamento.
+	 */
+	public function relations() {
+		return array(
+			'idUser' => array( self::BELONGS_TO, 'User', 'id_user' ),
+		);
+	}
  }
  ?>
